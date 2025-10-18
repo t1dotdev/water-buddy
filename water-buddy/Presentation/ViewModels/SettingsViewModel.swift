@@ -66,6 +66,30 @@ class SettingsViewModel: ObservableObject {
         }
     }
 
+    func updatePreferredUnit(_ unit: WaterUnit) async {
+        do {
+            print("📝 Updating preferred unit to: \(unit)")
+            try await updateUserDataUseCase.updatePreferredUnit(unit)
+            print("✅ Preferred unit saved successfully")
+
+            // Reload user data to ensure UI is updated
+            try await loadUserData()
+            print("✅ Preferred unit update complete. New value: \(user?.preferredUnit.name ?? "")")
+
+            // Post notification to update other screens
+            NotificationCenter.default.post(
+                name: Notification.Name("PreferredUnitUpdated"),
+                object: nil,
+                userInfo: ["newUnit": unit]
+            )
+
+            successMessage = NSLocalizedString("settings.unit_updated", value: "Unit updated successfully", comment: "")
+        } catch {
+            print("❌ Failed to update preferred unit: \(error.localizedDescription)")
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func updateReminderSettings(enabled: Bool, interval: TimeInterval, startTime: Date, endTime: Date) {
         Task {
             do {

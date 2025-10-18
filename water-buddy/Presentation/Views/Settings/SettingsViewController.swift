@@ -171,8 +171,9 @@ class SettingsViewController: UIViewController {
 
         for unit in WaterUnit.allCases {
             let action = UIAlertAction(title: unit.name, style: .default) { [weak self] _ in
-                // Update preferred unit
-                print("Selected unit: \(unit)")
+                Task {
+                    await self?.viewModel.updatePreferredUnit(unit)
+                }
             }
             alert.addAction(action)
         }
