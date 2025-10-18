@@ -1,0 +1,180 @@
+/* App Name */
+"app.name" = "Water Tracker";
+
+/* Tab Bar */
+"tab.home" = "Home";
+"tab.statistics" = "Stats";
+"tab.add_water" = "Add Water";
+"tab.history" = "History";
+"tab.settings" = "Settings";
+
+/* Home Screen */
+"home.title" = "Water Tracker";
+"greeting.morning" = "Good Morning";
+"greeting.afternoon" = "Good Afternoon";
+"greeting.evening" = "Good Evening";
+"greeting.night" = "Good Night";
+
+/* Progress */
+"progress.of_goal" = "of %@";
+"motivation.start" = "Great start! Keep hydrating! 💧";
+"motivation.quarter" = "You're doing well! Keep it up! 👍";
+"motivation.half" = "Halfway there! You've got this! 💪";
+"motivation.almost" = "Almost there! Final push! 🏃";
+"motivation.achieved" = "Goal achieved! Fantastic! 🎉";
+
+/* Streak */
+"streak.description" = "day streak";
+"streak.start" = "Start your streak!";
+"streak.one_day" = "day streak";
+"streak.multiple_days" = "days streak";
+
+/* Weather */
+"weather.hydration_tip" = "Hydration Tip";
+"weather.loading" = "Loading weather data...";
+"weather.unavailable" = "Weather data unavailable";
+"weather.sunny" = "Sunny";
+"weather.cloudy" = "Cloudy";
+"weather.rainy" = "Rainy";
+"weather.snowy" = "Snowy";
+"weather.hot" = "Hot";
+"weather.humid" = "Humid";
+
+/* Weather Recommendations */
+"weather.recommendation.normal" = "Normal hydration recommended";
+"weather.recommendation.hot" = "Hot weather! Increase water intake by 30%";
+"weather.recommendation.warm" = "Warm weather. Increase water intake by 15%";
+"weather.recommendation.dry" = " Dry air increases dehydration.";
+"weather.recommendation.humid" = " High humidity requires extra hydration.";
+"weather.recommendation.sunny" = " Sunny conditions increase water needs.";
+"weather.recommendation.extreme_heat" = "Extreme heat! Critical to stay hydrated";
+"weather.recommendation.very_humid" = " Very humid conditions increase sweating.";
+
+/* Add Water */
+"add_water.title" = "Add Water";
+"add_water.select_container" = "Select Container";
+"add_water.quick_amounts" = "Quick Amounts";
+"add_water.custom_amount" = "Custom Amount";
+"add_water.recent_amounts" = "Recent Amounts";
+"add_water.enter_amount" = "Enter amount (ml)";
+"add_water.add_custom" = "Add Custom Amount";
+"add_water.success" = "Added %dml successfully!";
+"add_water.invalid_amount" = "Please enter a valid amount between 1-5000ml";
+"add_water.invalid_format" = "Invalid number format";
+"add_water.quick_select" = "Quick Select";
+"add_water.container" = "Container Type";
+"add_water.add_button" = "Add %d ml";
+
+/* Containers */
+"container.glass" = "Glass";
+"container.bottle" = "Bottle";
+"container.cup" = "Cup";
+"container.mug" = "Mug";
+"container.custom" = "Custom";
+"container.custom_amount" = "Custom";
+
+/* Units */
+"unit.milliliters" = "Milliliters";
+"unit.ounces" = "Ounces";
+
+/* Statistics */
+"stats.title" = "Statistics";
+"stats.today" = "Today";
+"stats.week" = "Week";
+"stats.month" = "Month";
+"stats.year" = "Year";
+"chart.weekly_progress" = "Weekly Progress";
+
+/* Time Periods */
+"period.today" = "Today";
+"period.week" = "This Week";
+"period.month" = "This Month";
+"period.year" = "This Year";
+
+/* History */
+"history.title" = "History";
+"history.no_entries" = "No entries found";
+"history.delete_entry" = "Delete Entry";
+"history.edit_entry" = "Edit Entry";
+
+/* Settings */
+"settings.title" = "Settings";
+"settings.profile" = "Profile";
+"settings.daily_goal" = "Daily Goal";
+"settings.units" = "Units";
+"settings.reminders" = "Reminders";
+"settings.language" = "Language";
+"settings.about" = "About";
+"settings.privacy" = "Privacy Policy";
+"settings.terms" = "Terms of Service";
+"settings.support" = "Support";
+
+/* User */
+"user.default_name" = "User";
+
+/* Alerts */
+"alert.ok" = "OK";
+"alert.cancel" = "Cancel";
+"alert.save" = "Save";
+"alert.delete" = "Delete";
+"alert.confirm" = "Confirm";
+"alert.success" = "Success";
+"alert.error" = "Error";
+
+/* Errors */
+"error.invalid_amount" = "Please enter a valid amount between 1-5000ml";
+"error.data_not_found" = "Data not found";
+"error.save_failed" = "Failed to save data";
+"error.network" = "Network error occurred";
+"error.invalid_user" = "Invalid user data";
+"error.invalid_name" = "Please enter a valid name";
+"error.unsupported_language" = "Unsupported language";
+"error.invalid_time_range" = "Start time must be before end time";
+"error.invalid_interval" = "Reminder interval must be between 30 minutes and 8 hours";
+"error.image_too_large" = "Image size must be less than 5MB";
+
+/* Location Errors */
+"error.location.denied" = "Location permission denied";
+"error.location.not_determined" = "Location permission not determined";
+"error.location.not_available" = "Location not available";
+"error.location.unknown" = "Unknown location error";
+
+/* API Errors */
+"error.api.invalid_url" = "Invalid URL";
+"error.api.invalid_response" = "Invalid response";
+"error.api.server_error" = "Server error: %d";
+"error.api.network" = "Network error: %@";
+"error.api.decoding" = "Failed to decode response";
+
+/* Notification Errors */
+"error.notification.denied" = "Notification permission denied";
+"error.notification.scheduling" = "Failed to schedule notification";
+"error.notification.unknown" = "Unknown notification error";
+
+/* Data Source Errors */
+"error.encoding_failed" = "Failed to encode data";
+"error.decoding_failed" = "Failed to decode data";
+
+/* Notifications */
+"notification.reminder.title" = "Time to Hydrate!";
+"notification.reminder.body" = "Don't forget to drink some water!";
+"notification.message.1" = "Stay hydrated! Time for some water 💧";
+"notification.message.2" = "Your body is calling for water! 🥤";
+"notification.message.3" = "Hydration time! Keep up the good work! 👍";
+"notification.message.4" = "Don't forget to drink water and stay healthy! 💪";
+"notification.message.5" = "Time to refuel with some refreshing water! ⚡";
+
+/* Quick Actions */
+"quickaction.add_small.title" = "Add 250ml";
+"quickaction.add_small.subtitle" = "Quick log small glass";
+"quickaction.add_medium.title" = "Add 500ml";
+"quickaction.add_medium.subtitle" = "Quick log bottle";
+"quickaction.view_progress.title" = "View Progress";
+"quickaction.view_progress.subtitle" = "Check today's intake";
+"quickaction.reminder.title" = "Set Quick Reminder";
+"quickaction.reminder.subtitle" = "Remind in 1 hour";
+
+/* Quick Action Results */
+"quickaction.success.added" = "Added %dml successfully!";
+"quickaction.reminder.set" = "Reminder set for 1 hour!";
+"quickaction.reminder.failed" = "Failed to set reminder";
