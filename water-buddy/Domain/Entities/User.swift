@@ -13,6 +13,7 @@ class User {
     var reminderInterval: TimeInterval
     var startTime: Date
     var endTime: Date
+    var reminderTime: Date // Specific time for daily notification
     var profileImageData: Data?
     var createdDate: Date
     var lastActiveDate: Date
@@ -28,6 +29,7 @@ class User {
         reminderInterval: TimeInterval = 3600, // 1 hour
         startTime: Date = Calendar.current.date(from: DateComponents(hour: 8, minute: 0)) ?? Date(),
         endTime: Date = Calendar.current.date(from: DateComponents(hour: 22, minute: 0)) ?? Date(),
+        reminderTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date(), // 9:00 AM
         profileImageData: Data? = nil,
         createdDate: Date = Date(),
         lastActiveDate: Date = Date()
@@ -42,6 +44,7 @@ class User {
         self.reminderInterval = reminderInterval
         self.startTime = startTime
         self.endTime = endTime
+        self.reminderTime = reminderTime
         self.profileImageData = profileImageData
         self.createdDate = createdDate
         self.lastActiveDate = lastActiveDate

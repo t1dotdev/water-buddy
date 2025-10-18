@@ -78,6 +78,14 @@ class UserRepository: UserRepositoryProtocol {
         print("✅ Reminder settings updated and saved")
     }
 
+    func updateDailyReminderSettings(enabled: Bool, time: Date) async throws {
+        let user = try await getUser()
+        user.reminderEnabled = enabled
+        user.reminderTime = time
+        try modelContext.save()
+        print("✅ Daily reminder settings updated - Enabled: \(enabled), Time: \(time)")
+    }
+
     func updateStreakCount(_ count: Int) async throws {
         let user = try await getUser()
         user.streakCount = count

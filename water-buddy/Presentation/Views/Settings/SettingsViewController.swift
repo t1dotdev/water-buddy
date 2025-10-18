@@ -22,24 +22,33 @@ class SettingsViewController: UIViewController {
         return indicator
     }()
 
-    // Settings sections
-    private let sections: [SettingsSection] = [
-        SettingsSection(title: NSLocalizedString("settings.profile", value: "Profile", comment: ""), items: [
-            SettingsItem(title: NSLocalizedString("settings.daily_goal", value: "Daily Goal", comment: ""), type: .dailyGoal),
-            SettingsItem(title: NSLocalizedString("settings.units", value: "Units", comment: ""), type: .units)
-        ]),
-        SettingsSection(title: NSLocalizedString("settings.reminders", value: "Reminders", comment: ""), items: [
-            SettingsItem(title: NSLocalizedString("settings.reminders", value: "Enable Reminders", comment: ""), type: .reminders)
-        ]),
-        SettingsSection(title: NSLocalizedString("settings.language", value: "Language", comment: ""), items: [
-            SettingsItem(title: NSLocalizedString("settings.language", value: "Language", comment: ""), type: .language)
-        ]),
-        SettingsSection(title: NSLocalizedString("settings.about", value: "About", comment: ""), items: [
-            SettingsItem(title: NSLocalizedString("settings.privacy", value: "Privacy Policy", comment: ""), type: .privacy),
-            SettingsItem(title: NSLocalizedString("settings.terms", value: "Terms of Service", comment: ""), type: .terms),
-            SettingsItem(title: NSLocalizedString("settings.support", value: "Support", comment: ""), type: .support)
-        ])
-    ]
+    // Settings sections - computed to dynamically show/hide reminder time
+    private var sections: [SettingsSection] {
+        var reminderItems = [
+            SettingsItem(title: NSLocalizedString("settings.enable_reminders", value: "Enable Reminders", comment: ""), type: .reminders)
+        ]
+
+        // Add reminder time only if reminders are enabled
+        if viewModel.user?.reminderEnabled ?? false {
+            reminderItems.append(
+                SettingsItem(title: NSLocalizedString("settings.reminder_time", value: "Reminder Time", comment: ""), type: .reminderTime)
+            )
+        }
+
+        return [
+            SettingsSection(title: NSLocalizedString("settings.profile", value: "Profile", comment: ""), items: [
+                SettingsItem(title: NSLocalizedString("settings.daily_goal", value: "Daily Goal", comment: ""), type: .dailyGoal),
+                SettingsItem(title: NSLocalizedString("settings.units", value: "Units", comment: ""), type: .units)
+            ]),
+            SettingsSection(title: NSLocalizedString("settings.reminders", value: "Reminders", comment: ""), items: reminderItems),
+            SettingsSection(title: NSLocalizedString("settings.language", value: "Language", comment: ""), items: [
+                SettingsItem(title: NSLocalizedString("settings.language", value: "Language", comment: ""), type: .language)
+            ]),
+            SettingsSection(title: NSLocalizedString("settings.app_info", value: "App Info", comment: ""), items: [
+                SettingsItem(title: NSLocalizedString("settings.version", value: "Version", comment: ""), type: .appVersion)
+            ])
+        ]
+    }
 
     // MARK: - Lifecycle
 
@@ -135,16 +144,14 @@ class SettingsViewController: UIViewController {
         case .units:
             showUnitPicker()
         case .reminders:
-            // Toggle reminders or show reminder settings
-            break
+            showReminderToggle()
+        case .reminderTime:
+            showReminderTimePicker()
         case .language:
             showLanguagePicker()
-        case .privacy:
-            openURL(Constants.URLs.privacyPolicy)
-        case .terms:
-            openURL(Constants.URLs.termsOfService)
-        case .support:
-            openURL(Constants.URLs.support)
+        case .appVersion:
+            // App version is read-only, no action needed
+            break
         }
     }
 
@@ -205,9 +212,77 @@ class SettingsViewController: UIViewController {
         present(alert, animated: true)
     }
 
-    private func openURL(_ urlString: String) {
-        guard let url = URL(string: urlString) else { return }
-        UIApplication.shared.open(url)
+    private func showReminderToggle() {
+        let currentlyEnabled = viewModel.user?.reminderEnabled ?? false
+        let currentTime = viewModel.user?.reminderTime ?? Date()
+
+        let alert = UIAlertController(
+            title: NSLocalizedString("settings.enable_reminders", value: "Enable Reminders", comment: ""),
+            message: NSLocalizedString("settings.reminder_toggle_message", value: "Would you like to receive daily water reminders?", comment: ""),
+            preferredStyle: .actionSheet
+        )
+
+        let enableAction = UIAlertAction(
+            title: NSLocalizedString("settings.enable", value: "Enable", comment: ""),
+            style: .default
+        ) { [weak self] _ in
+            Task {
+                await self?.viewModel.updateDailyReminder(enabled: true, time: currentTime)
+            }
+        }
+
+        let disableAction = UIAlertAction(
+            title: NSLocalizedString("settings.disable", value: "Disable", comment: ""),
+            style: .destructive
+        ) { [weak self] _ in
+            Task {
+                await self?.viewModel.updateDailyReminder(enabled: false, time: currentTime)
+            }
+        }
+
+        alert.addAction(currentlyEnabled ? disableAction : enableAction)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("alert.cancel", value: "Cancel", comment: ""), style: .cancel))
+
+        present(alert, animated: true)
+    }
+
+    private func showReminderTimePicker() {
+        let currentTime = viewModel.user?.reminderTime ?? Date()
+
+        let alert = UIAlertController(
+            title: NSLocalizedString("settings.reminder_time", value: "Reminder Time", comment: ""),
+            message: "\n\n\n\n\n\n\n\n\n", // Add spacing for the picker
+            preferredStyle: .alert
+        )
+
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = .time
+        datePicker.preferredDatePickerStyle = .wheels
+        datePicker.date = currentTime
+        datePicker.translatesAutoresizingMaskIntoConstraints = false
+
+        alert.view.addSubview(datePicker)
+
+        NSLayoutConstraint.activate([
+            datePicker.centerXAnchor.constraint(equalTo: alert.view.centerXAnchor),
+            datePicker.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 55),
+            datePicker.widthAnchor.constraint(equalToConstant: 270),
+            datePicker.heightAnchor.constraint(equalToConstant: 162)
+        ])
+
+        let confirmAction = UIAlertAction(
+            title: NSLocalizedString("alert.confirm", value: "Confirm", comment: ""),
+            style: .default
+        ) { [weak self] _ in
+            Task {
+                await self?.viewModel.updateDailyReminder(enabled: true, time: datePicker.date)
+            }
+        }
+
+        alert.addAction(confirmAction)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("alert.cancel", value: "Cancel", comment: ""), style: .cancel))
+
+        present(alert, animated: true)
     }
 }
 
@@ -233,24 +308,35 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
 
         cell.textLabel?.text = item.title
         cell.textLabel?.font = FontManager.shared.body
-        cell.accessoryType = .disclosureIndicator
 
         // Set detail text based on item type
         switch item.type {
         case .dailyGoal:
             let goal = viewModel.user?.dailyGoal ?? 2000.0
             cell.detailTextLabel?.text = "\(Int(goal))ml"
+            cell.accessoryType = .disclosureIndicator
         case .units:
             let unit = viewModel.user?.preferredUnit ?? .milliliters
             cell.detailTextLabel?.text = unit.name
+            cell.accessoryType = .disclosureIndicator
         case .language:
             let language = viewModel.user?.language ?? "en"
             cell.detailTextLabel?.text = language == "en" ? "English" : "ภาษาไทย"
+            cell.accessoryType = .disclosureIndicator
         case .reminders:
             let enabled = viewModel.user?.reminderEnabled ?? true
             cell.detailTextLabel?.text = enabled ? NSLocalizedString("settings.on", value: "On", comment: "") : NSLocalizedString("settings.off", value: "Off", comment: "")
-        default:
-            cell.detailTextLabel?.text = nil
+            cell.accessoryType = .disclosureIndicator
+        case .reminderTime:
+            let time = viewModel.user?.reminderTime ?? Date()
+            let formatter = DateFormatter()
+            formatter.timeStyle = .short
+            cell.detailTextLabel?.text = formatter.string(from: time)
+            cell.accessoryType = .disclosureIndicator
+        case .appVersion:
+            cell.detailTextLabel?.text = "1.0.0"
+            cell.accessoryType = .none
+            cell.selectionStyle = .none
         }
 
         return cell
@@ -279,8 +365,7 @@ enum SettingsItemType {
     case dailyGoal
     case units
     case reminders
+    case reminderTime
     case language
-    case privacy
-    case terms
-    case support
+    case appVersion
 }

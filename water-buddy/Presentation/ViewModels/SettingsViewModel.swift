@@ -129,6 +129,35 @@ class SettingsViewModel: ObservableObject {
         }
     }
 
+    func updateDailyReminder(enabled: Bool, time: Date) async {
+        do {
+            print("⏰ Updating daily reminder - Enabled: \(enabled), Time: \(time)")
+
+            // Update in database
+            try await updateUserDataUseCase.updateDailyReminderSettings(enabled: enabled, time: time)
+
+            // Schedule or cancel notification
+            try await manageRemindersUseCase.scheduleDailyReminder(enabled: enabled, time: time)
+
+            // Reload user data
+            try await loadUserData()
+
+            if enabled {
+                let formatter = DateFormatter()
+                formatter.timeStyle = .short
+                let timeString = formatter.string(from: time)
+                successMessage = String(format: NSLocalizedString("settings.reminder_set", value: "Daily reminder set for %@", comment: ""), timeString)
+            } else {
+                successMessage = NSLocalizedString("settings.reminder_disabled", value: "Daily reminder disabled", comment: "")
+            }
+
+            print("✅ Daily reminder update complete")
+        } catch {
+            print("❌ Failed to update daily reminder: \(error.localizedDescription)")
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func clearError() {
         errorMessage = nil
     }

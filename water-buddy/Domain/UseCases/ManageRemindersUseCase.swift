@@ -3,6 +3,7 @@ import UserNotifications
 
 protocol ManageRemindersUseCase {
     func scheduleReminders(enabled: Bool, interval: TimeInterval, startTime: Date, endTime: Date) async throws
+    func scheduleDailyReminder(enabled: Bool, time: Date) async throws
     func cancelAllReminders() async throws
     func scheduleQuickReminder(in timeInterval: TimeInterval) async throws
     func checkNotificationPermission() async throws -> Bool
@@ -26,6 +27,22 @@ class ManageRemindersUseCaseImpl: ManageRemindersUseCase {
 
         // Schedule recurring reminders
         try await scheduleRecurringReminders(interval: interval, startTime: startTime, endTime: endTime)
+    }
+
+    func scheduleDailyReminder(enabled: Bool, time: Date) async throws {
+        // Cancel existing reminders
+        try await cancelAllReminders()
+
+        guard enabled else { return }
+
+        // Ensure we have permission
+        let hasPermission = try await checkNotificationPermission()
+        guard hasPermission else {
+            throw NotificationError.permissionDenied
+        }
+
+        // Schedule single daily reminder
+        try await scheduleDailyReminderNotification(time: time)
     }
 
     func cancelAllReminders() async throws {
@@ -89,6 +106,31 @@ class ManageRemindersUseCaseImpl: ManageRemindersUseCase {
 
             try await notificationCenter.add(request)
         }
+    }
+
+    private func scheduleDailyReminderNotification(time: Date) async throws {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: time)
+        let minute = calendar.component(.minute, from: time)
+
+        let content = UNMutableNotificationContent()
+        content.title = NSLocalizedString("notification.reminder.title", value: "Time to Hydrate!", comment: "")
+        content.body = generateReminderMessage()
+        content.sound = UNNotificationSound.default
+        content.badge = 1
+
+        var dateComponents = DateComponents()
+        dateComponents.hour = hour
+        dateComponents.minute = minute
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+        let request = UNNotificationRequest(
+            identifier: "daily-hydration-reminder",
+            content: content,
+            trigger: trigger
+        )
+
+        try await notificationCenter.add(request)
     }
 
     private func generateReminderMessage() -> String {

@@ -100,17 +100,24 @@
 "settings.daily_goal" = "เป้าหมายรายวัน";
 "settings.units" = "หน่วย";
 "settings.reminders" = "การแจ้งเตือน";
+"settings.enable_reminders" = "เปิดการแจ้งเตือน";
+"settings.reminder_time" = "เวลาแจ้งเตือน";
 "settings.language" = "ภาษา";
-"settings.about" = "เกี่ยวกับ";
-"settings.privacy" = "นโยบายความเป็นส่วนตัว";
-"settings.terms" = "ข้อกำหนดการใช้งาน";
-"settings.support" = "สนับสนุน";
+"settings.app_info" = "ข้อมูลแอป";
+"settings.version" = "เวอร์ชัน";
 "settings.on" = "เปิด";
 "settings.off" = "ปิด";
+"settings.enable" = "เปิด";
+"settings.disable" = "ปิด";
 "settings.enter_goal" = "ใส่เป้าหมายการดื่มน้ำรายวัน (มล.)";
 "settings.goal_updated" = "อัปเดตเป้าหมายรายวันสำเร็จ";
 "settings.unit_updated" = "อัปเดตหน่วยสำเร็จ";
 "settings.language_updated" = "เปลี่ยนภาษาสำเร็จ";
+"settings.reminder_toggle_message" = "คุณต้องการรับการแจ้งเตือนการดื่มน้ำรายวันหรือไม่?";
+"settings.select_time" = "เลือกเวลาที่คุณต้องการได้รับการแจ้งเตือน";
+"settings.reminder_set" = "ตั้งการแจ้งเตือนรายวันเวลา %@ แล้ว";
+"settings.reminder_disabled" = "ปิดการแจ้งเตือนรายวันแล้ว";
+"settings.reminders_updated" = "อัปเดตการตั้งค่าการแจ้งเตือนแล้ว";
 
 /* User */
 "user.default_name" = "ผู้ใช้";

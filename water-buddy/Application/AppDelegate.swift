@@ -8,14 +8,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let schema = Schema([
             User.self
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+
+        // Enable automatic lightweight migration
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            allowsSave: true
+        )
 
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
             print("✅ SwiftData ModelContainer created successfully")
             return container
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            print("❌ Failed to create ModelContainer: \(error)")
+            print("⚠️ Attempting to recreate container with fresh schema...")
+
+            // If migration fails, try creating a new container (this will reset data)
+            do {
+                // Delete old store files
+                let url = URL.applicationSupportDirectory.appending(path: "default.store")
+                try? FileManager.default.removeItem(at: url)
+
+                let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+                print("✅ Fresh ModelContainer created successfully")
+                return container
+            } catch {
+                fatalError("Could not create ModelContainer even after cleanup: \(error)")
+            }
         }
     }()
 

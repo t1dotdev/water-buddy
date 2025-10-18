@@ -8,6 +8,7 @@ protocol UserRepositoryProtocol {
     func updateName(_ name: String) async throws
     func updateLanguage(_ language: String) async throws
     func updateReminderSettings(enabled: Bool, interval: TimeInterval, startTime: Date, endTime: Date) async throws
+    func updateDailyReminderSettings(enabled: Bool, time: Date) async throws
     func updateStreakCount(_ count: Int) async throws
     func updateProfileImage(_ imageData: Data?) async throws
     func resetUserData() async throws

@@ -6,6 +6,7 @@ protocol UpdateUserDataUseCase {
     func updateName(_ name: String) async throws
     func updateLanguage(_ language: String) async throws
     func updateReminderSettings(enabled: Bool, interval: TimeInterval, startTime: Date, endTime: Date) async throws
+    func updateDailyReminderSettings(enabled: Bool, time: Date) async throws
     func updateProfileImage(_ imageData: Data?) async throws
     func resetAllData() async throws
 }
@@ -60,6 +61,10 @@ class UpdateUserDataUseCaseImpl: UpdateUserDataUseCase {
             startTime: startTime,
             endTime: endTime
         )
+    }
+
+    func updateDailyReminderSettings(enabled: Bool, time: Date) async throws {
+        try await userRepository.updateDailyReminderSettings(enabled: enabled, time: time)
     }
 
     func updateProfileImage(_ imageData: Data?) async throws {

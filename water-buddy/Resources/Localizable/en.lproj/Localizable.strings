@@ -103,17 +103,24 @@
 "settings.daily_goal" = "Daily Goal";
 "settings.units" = "Units";
 "settings.reminders" = "Reminders";
+"settings.enable_reminders" = "Enable Reminders";
+"settings.reminder_time" = "Reminder Time";
 "settings.language" = "Language";
-"settings.about" = "About";
-"settings.privacy" = "Privacy Policy";
-"settings.terms" = "Terms of Service";
-"settings.support" = "Support";
+"settings.app_info" = "App Info";
+"settings.version" = "Version";
 "settings.on" = "On";
 "settings.off" = "Off";
+"settings.enable" = "Enable";
+"settings.disable" = "Disable";
 "settings.enter_goal" = "Enter your daily water goal (ml)";
 "settings.goal_updated" = "Daily goal updated successfully";
 "settings.unit_updated" = "Unit updated successfully";
 "settings.language_updated" = "Language updated successfully";
+"settings.reminder_toggle_message" = "Would you like to receive daily water reminders?";
+"settings.select_time" = "Select the time you'd like to be reminded";
+"settings.reminder_set" = "Daily reminder set for %@";
+"settings.reminder_disabled" = "Daily reminder disabled";
+"settings.reminders_updated" = "Reminder settings updated";
 
 /* User */
 "user.default_name" = "User";
