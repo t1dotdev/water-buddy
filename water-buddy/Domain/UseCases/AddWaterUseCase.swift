@@ -68,6 +68,7 @@ enum WaterBuddyError: Error, LocalizedError {
     case saveFailed
     case networkError
     case invalidUser
+    case dataCorrupted
 
     var errorDescription: String? {
         switch self {
@@ -81,6 +82,8 @@ enum WaterBuddyError: Error, LocalizedError {
             return NSLocalizedString("error.network", value: "Network error occurred", comment: "")
         case .invalidUser:
             return NSLocalizedString("error.invalid_user", value: "Invalid user data", comment: "")
+        case .dataCorrupted:
+            return NSLocalizedString("error.data_corrupted", value: "Data is corrupted. Please try resetting app data.", comment: "")
         }
     }
 }

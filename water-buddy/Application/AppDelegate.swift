@@ -1,11 +1,31 @@
 import UIKit
+import SwiftData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    static var sharedModelContainer: ModelContainer = {
+        let schema = Schema([
+            User.self
+        ])
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+
+        do {
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            print("✅ SwiftData ModelContainer created successfully")
+            return container
+        } catch {
+            fatalError("Could not create ModelContainer: \(error)")
+        }
+    }()
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         NSLog("🔧 AppDelegate: didFinishLaunchingWithOptions called")
         print("🔧 AppDelegate: didFinishLaunchingWithOptions called")
+
+        // Initialize SwiftData
+        _ = AppDelegate.sharedModelContainer
+        print("✅ SwiftData initialized")
 
         // Configure appearance
         configureAppAppearance()

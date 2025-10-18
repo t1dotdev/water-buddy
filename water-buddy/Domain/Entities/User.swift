@@ -1,6 +1,8 @@
 import Foundation
+import SwiftData
 
-struct User: Codable, Equatable {
+@Model
+class User {
     var id: UUID
     var name: String
     var dailyGoal: Double
@@ -61,15 +63,15 @@ struct User: Codable, Equatable {
         return unit.convert(from: preferredUnit, amount: dailyGoal)
     }
 
-    mutating func updateLastActiveDate() {
+    func updateLastActiveDate() {
         lastActiveDate = Date()
     }
 
-    mutating func incrementStreak() {
+    func incrementStreak() {
         streakCount += 1
     }
 
-    mutating func resetStreak() {
+    func resetStreak() {
         streakCount = 0
     }
 

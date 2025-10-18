@@ -1,7 +1,14 @@
 import Foundation
+import SwiftData
 
 class DependencyContainer {
     static let shared = DependencyContainer()
+
+    // MARK: - SwiftData
+    @MainActor
+    lazy var modelContext: ModelContext = {
+        AppDelegate.sharedModelContainer.mainContext
+    }()
 
     // MARK: - Data Sources
     lazy var userDefaultsDataSource: UserDefaultsDataSource = {
@@ -28,9 +35,10 @@ class DependencyContainer {
         )
     }()
 
+    @MainActor
     lazy var userRepository: UserRepositoryProtocol = {
         UserRepository(
-            userDefaultsDataSource: userDefaultsDataSource
+            modelContext: modelContext
         )
     }()
 
@@ -41,6 +49,7 @@ class DependencyContainer {
     }()
 
     // MARK: - Use Cases
+    @MainActor
     lazy var addWaterUseCase: AddWaterUseCase = {
         AddWaterUseCaseImpl(
             waterRepository: waterRepository,
@@ -64,12 +73,14 @@ class DependencyContainer {
         ManageRemindersUseCaseImpl()
     }()
 
+    @MainActor
     lazy var getUserDataUseCase: GetUserDataUseCase = {
         GetUserDataUseCaseImpl(
             userRepository: userRepository
         )
     }()
 
+    @MainActor
     lazy var updateUserDataUseCase: UpdateUserDataUseCase = {
         UpdateUserDataUseCaseImpl(
             userRepository: userRepository

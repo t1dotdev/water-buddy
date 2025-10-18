@@ -53,9 +53,9 @@ class AppCoordinator {
 
     func handleQuickAddWater(amount: Double) {
         // Add water entry quickly
-        let addWaterUseCase = dependencyContainer.addWaterUseCase
+        Task { @MainActor in
+            let addWaterUseCase = dependencyContainer.addWaterUseCase
 
-        Task {
             do {
                 let entry = try await addWaterUseCase.execute(amount: amount, container: .glass)
                 await MainActor.run {

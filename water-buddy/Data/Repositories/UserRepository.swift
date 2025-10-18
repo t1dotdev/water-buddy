@@ -1,98 +1,128 @@
 import Foundation
+import SwiftData
 
+@MainActor
 class UserRepository: UserRepositoryProtocol {
-    private let userDefaultsDataSource: UserDefaultsDataSource
-    private let userKey = "current_user"
+    private let modelContext: ModelContext
 
-    init(userDefaultsDataSource: UserDefaultsDataSource) {
-        self.userDefaultsDataSource = userDefaultsDataSource
+    init(modelContext: ModelContext) {
+        self.modelContext = modelContext
     }
 
     func getUser() async throws -> User {
-        // Try safe loading first
-        if let user = userDefaultsDataSource.loadSafely(User.self, forKey: userKey) {
-            return user
+        // Fetch the first user from SwiftData
+        let descriptor = FetchDescriptor<User>()
+        let users = try modelContext.fetch(descriptor)
+
+        if let existingUser = users.first {
+            print("📖 Loaded user from SwiftData. Daily goal: \(existingUser.dailyGoal)")
+            return existingUser
         }
-        
-        // If no user or corrupted data, create default user
+
+        // If no user exists, create default user
+        print("⚠️ No user found. Creating default user with dailyGoal=2000.")
         let defaultUser = User()
-        try await saveUser(defaultUser)
+        modelContext.insert(defaultUser)
+        try modelContext.save()
+        print("✅ Default user created and saved with SwiftData")
         return defaultUser
     }
 
     func saveUser(_ user: User) async throws {
-        try userDefaultsDataSource.save(user, forKey: userKey)
+        // SwiftData tracks changes automatically
+        // Just save the context to persist any changes
+        try modelContext.save()
+        print("💾 User saved with SwiftData")
     }
 
     func updateDailyGoal(_ goal: Double) async throws {
-        var user = try await getUser()
+        let user = try await getUser()
+        print("📊 Current daily goal: \(user.dailyGoal), New daily goal: \(goal)")
         user.dailyGoal = goal
-        try await saveUser(user)
+        try modelContext.save()
+        print("✅ Daily goal updated to \(goal) and saved with SwiftData")
     }
 
     func updatePreferredUnit(_ unit: WaterUnit) async throws {
-        var user = try await getUser()
+        let user = try await getUser()
         user.preferredUnit = unit
-        try await saveUser(user)
+        try modelContext.save()
+        print("✅ Preferred unit updated and saved")
     }
 
     func updateName(_ name: String) async throws {
-        var user = try await getUser()
+        let user = try await getUser()
         user.name = name
-        try await saveUser(user)
+        try modelContext.save()
+        print("✅ Name updated and saved")
     }
 
     func updateLanguage(_ language: String) async throws {
-        var user = try await getUser()
+        let user = try await getUser()
         user.language = language
-        try await saveUser(user)
+        try modelContext.save()
 
         // Update app language
         UserDefaults.standard.set([language], forKey: "AppleLanguages")
         UserDefaults.standard.synchronize()
+        print("✅ Language updated and saved")
     }
 
     func updateReminderSettings(enabled: Bool, interval: TimeInterval, startTime: Date, endTime: Date) async throws {
-        var user = try await getUser()
+        let user = try await getUser()
         user.reminderEnabled = enabled
         user.reminderInterval = interval
         user.startTime = startTime
         user.endTime = endTime
-        try await saveUser(user)
+        try modelContext.save()
+        print("✅ Reminder settings updated and saved")
     }
 
     func updateStreakCount(_ count: Int) async throws {
-        var user = try await getUser()
+        let user = try await getUser()
         user.streakCount = count
-        try await saveUser(user)
+        try modelContext.save()
+        print("✅ Streak count updated and saved")
     }
 
     func updateProfileImage(_ imageData: Data?) async throws {
-        var user = try await getUser()
+        let user = try await getUser()
         user.profileImageData = imageData
-        try await saveUser(user)
+        try modelContext.save()
+        print("✅ Profile image updated and saved")
     }
 
     func resetUserData() async throws {
+        // Delete existing user
+        let descriptor = FetchDescriptor<User>()
+        let users = try modelContext.fetch(descriptor)
+        users.forEach { modelContext.delete($0) }
+
+        // Create new default user
         let defaultUser = User()
-        try await saveUser(defaultUser)
+        modelContext.insert(defaultUser)
+        try modelContext.save()
+        print("✅ User data reset to defaults")
     }
 
     func updateLastActiveDate() async throws {
-        var user = try await getUser()
+        let user = try await getUser()
         user.updateLastActiveDate()
-        try await saveUser(user)
+        try modelContext.save()
+        print("✅ Last active date updated")
     }
 
     func incrementStreak() async throws {
-        var user = try await getUser()
+        let user = try await getUser()
         user.incrementStreak()
-        try await saveUser(user)
+        try modelContext.save()
+        print("✅ Streak incremented and saved")
     }
 
     func resetStreak() async throws {
-        var user = try await getUser()
+        let user = try await getUser()
         user.resetStreak()
-        try await saveUser(user)
+        try modelContext.save()
+        print("✅ Streak reset and saved")
     }
 }

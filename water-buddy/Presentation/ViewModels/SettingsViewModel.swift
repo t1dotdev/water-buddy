@@ -22,56 +22,47 @@ class SettingsViewModel: ObservableObject {
         self.manageRemindersUseCase = manageRemindersUseCase
     }
 
-    func loadUserData() {
-        Task {
-            isLoading = true
-            errorMessage = nil
+    func loadUserData() async throws {
+        isLoading = true
+        errorMessage = nil
 
-            do {
-                user = try await getUserDataUseCase.execute()
-            } catch {
-                errorMessage = error.localizedDescription
-            }
+        user = try await getUserDataUseCase.execute()
+        print("✅ User data loaded successfully. Daily goal: \(user?.dailyGoal ?? 0)")
 
-            isLoading = false
+        isLoading = false
+    }
+
+    func updateDailyGoal(_ goal: Double) async {
+        do {
+            print("📝 Updating daily goal to: \(goal)")
+            try await updateUserDataUseCase.updateDailyGoal(goal)
+            print("✅ Daily goal saved successfully")
+
+            // Reload user data to ensure UI is updated
+            try await loadUserData()
+            print("✅ Daily goal update complete. New value: \(user?.dailyGoal ?? 0)")
+
+            // Post notification to update other screens
+            NotificationCenter.default.post(
+                name: Notification.Name("DailyGoalUpdated"),
+                object: nil,
+                userInfo: ["newGoal": goal]
+            )
+
+            successMessage = NSLocalizedString("settings.goal_updated", value: "Daily goal updated successfully", comment: "")
+        } catch {
+            print("❌ Failed to update daily goal: \(error.localizedDescription)")
+            errorMessage = error.localizedDescription
         }
     }
 
-    func updateDailyGoal(_ goal: Double) {
-        Task {
-            do {
-                try await updateUserDataUseCase.updateDailyGoal(goal)
-                
-                // Reload user data to ensure UI is updated
-                await loadUserData()
-                
-                // Post notification to update other screens
-                await MainActor.run {
-                    NotificationCenter.default.post(
-                        name: Notification.Name("DailyGoalUpdated"),
-                        object: nil,
-                        userInfo: ["newGoal": goal]
-                    )
-                    
-                    successMessage = NSLocalizedString("settings.goal_updated", value: "Daily goal updated successfully", comment: "")
-                }
-            } catch {
-                await MainActor.run {
-                    errorMessage = error.localizedDescription
-                }
-            }
-        }
-    }
-
-    func updateLanguage(_ language: String) {
-        Task {
-            do {
-                try await updateUserDataUseCase.updateLanguage(language)
-                successMessage = NSLocalizedString("settings.language_updated", value: "Language updated successfully", comment: "")
-                await loadUserData()
-            } catch {
-                errorMessage = error.localizedDescription
-            }
+    func updateLanguage(_ language: String) async {
+        do {
+            try await updateUserDataUseCase.updateLanguage(language)
+            try await loadUserData()
+            successMessage = NSLocalizedString("settings.language_updated", value: "Language updated successfully", comment: "")
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 
@@ -93,8 +84,8 @@ class SettingsViewModel: ObservableObject {
                     endTime: endTime
                 )
 
+                try await loadUserData()
                 successMessage = NSLocalizedString("settings.reminders_updated", value: "Reminder settings updated", comment: "")
-                await loadUserData()
             } catch {
                 errorMessage = error.localizedDescription
             }

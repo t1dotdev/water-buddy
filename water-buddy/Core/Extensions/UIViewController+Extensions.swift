@@ -38,12 +38,13 @@ extension UIViewController {
         present(alert, animated: true)
     }
 
-    func showTextInputAlert(title: String, message: String, placeholder: String = "", currentText: String = "", onConfirm: @escaping (String) -> Void) {
+    func showTextInputAlert(title: String, message: String, placeholder: String = "", currentText: String = "", keyboardType: UIKeyboardType = .default, onConfirm: @escaping (String) -> Void) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
 
         alert.addTextField { textField in
             textField.placeholder = placeholder
             textField.text = currentText
+            textField.keyboardType = keyboardType
         }
 
         alert.addAction(UIAlertAction(title: NSLocalizedString("alert.cancel", value: "Cancel", comment: ""), style: .cancel))

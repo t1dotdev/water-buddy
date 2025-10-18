@@ -52,7 +52,13 @@ class SettingsViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        viewModel.loadUserData()
+        Task {
+            do {
+                try await viewModel.loadUserData()
+            } catch {
+                print("⚠️ Failed to load user data in settings: \(error.localizedDescription)")
+            }
+        }
     }
 
     // MARK: - Setup Methods
@@ -149,10 +155,13 @@ class SettingsViewController: UIViewController {
             title: NSLocalizedString("settings.daily_goal", value: "Daily Goal", comment: ""),
             message: NSLocalizedString("settings.enter_goal", value: "Enter your daily water goal (ml)", comment: ""),
             placeholder: "2000",
-            currentText: "\(Int(currentGoal))"
+            currentText: "\(Int(currentGoal))",
+            keyboardType: .numberPad
         ) { [weak self] text in
             if let goal = Double(text), goal > 0 && goal <= 10000 {
-                self?.viewModel.updateDailyGoal(goal)
+                Task {
+                    await self?.viewModel.updateDailyGoal(goal)
+                }
             }
         }
     }
@@ -183,7 +192,9 @@ class SettingsViewController: UIViewController {
 
         for (code, name) in languages {
             let action = UIAlertAction(title: name, style: .default) { [weak self] _ in
-                self?.viewModel.updateLanguage(code)
+                Task {
+                    await self?.viewModel.updateLanguage(code)
+                }
             }
             alert.addAction(action)
         }
