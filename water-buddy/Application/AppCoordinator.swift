@@ -4,13 +4,28 @@ class AppCoordinator {
     private let window: UIWindow
     private var tabBarController: UITabBarController?
     private let dependencyContainer = DependencyContainer.shared
+    private var languageObserver: NSObjectProtocol?
 
     init(window: UIWindow) {
         self.window = window
+        setupLanguageObserver()
+    }
+
+    deinit {
+        if let observer = languageObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 
     func start() {
         print("🔧 AppCoordinator: start() called")
+
+        // Set up language bundle to make NSLocalizedString use LanguageManager
+        Bundle.setupLanguageBundle()
+        print("✅ Language bundle setup complete")
+
+        // Initialize language from user's saved preference
+        initializeLanguage()
 
         do {
             let tabBarController = MainTabBarController()
@@ -49,6 +64,61 @@ class AppCoordinator {
         }
     }
 
+    // MARK: - Language Management
+
+    private func setupLanguageObserver() {
+        languageObserver = NotificationCenter.default.addObserver(
+            forName: LanguageManager.languageDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            print("🌐 Language changed notification received, reloading UI...")
+            self?.reloadRootViewController()
+        }
+    }
+
+    private func initializeLanguage() {
+        Task { @MainActor in
+            do {
+                let getUserDataUseCase = dependencyContainer.getUserDataUseCase
+                let user = try await getUserDataUseCase.execute()
+
+                LanguageManager.shared.initializeWithUserLanguage(user.language)
+                print("🌐 Language initialized from user preference: \(user.language)")
+            } catch {
+                print("⚠️ Could not load user language preference: \(error.localizedDescription)")
+                print("🌐 Using default language: \(LanguageManager.shared.currentLanguage)")
+            }
+        }
+    }
+
+    private func reloadRootViewController() {
+        print("🔄 Reloading root view controller for language change...")
+
+        // Create new tab bar controller with updated language
+        let newTabBarController = MainTabBarController()
+
+        // Preserve the selected tab
+        if let currentIndex = tabBarController?.selectedIndex {
+            newTabBarController.selectedIndex = currentIndex
+        }
+
+        self.tabBarController = newTabBarController
+
+        // Animate the transition
+        UIView.transition(
+            with: window,
+            duration: 0.3,
+            options: .transitionCrossDissolve,
+            animations: {
+                self.window.rootViewController = newTabBarController
+            },
+            completion: { _ in
+                print("✅ Root view controller reloaded successfully")
+            }
+        )
+    }
+
     // MARK: - Quick Actions
 
     func handleQuickAddWater(amount: Double) {
@@ -58,15 +128,11 @@ class AppCoordinator {
 
             do {
                 let entry = try await addWaterUseCase.execute(amount: amount, container: .glass)
-                await MainActor.run {
-                    showSuccessAlert(message: NSLocalizedString("quickaction.success.added", value: "Added \(Int(amount))ml successfully!", comment: ""))
-                    // Navigate to home tab to show updated progress
-                    tabBarController?.selectedIndex = 0
-                }
+                showSuccessAlert(message: NSLocalizedString("quickaction.success.added", value: "Added \(Int(amount))ml successfully!", comment: ""))
+                // Navigate to home tab to show updated progress
+                tabBarController?.selectedIndex = 0
             } catch {
-                await MainActor.run {
-                    showErrorAlert(message: error.localizedDescription)
-                }
+                showErrorAlert(message: error.localizedDescription)
             }
         }
     }

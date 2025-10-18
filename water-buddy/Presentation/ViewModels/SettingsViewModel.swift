@@ -58,10 +58,23 @@ class SettingsViewModel: ObservableObject {
 
     func updateLanguage(_ language: String) async {
         do {
+            print("🌐 Updating language to: \(language)")
+
+            // Update in database
             try await updateUserDataUseCase.updateLanguage(language)
+
+            // Update LanguageManager
+            LanguageManager.shared.setLanguage(language)
+
+            // Reload user data
             try await loadUserData()
-            successMessage = NSLocalizedString("settings.language_updated", value: "Language updated successfully", comment: "")
+
+            print("✅ Language update complete")
+
+            // Note: The LanguageManager will post a notification that triggers UI reload
+            successMessage = localizedString("settings.language_updated", value: "Language updated successfully", comment: "")
         } catch {
+            print("❌ Failed to update language: \(error.localizedDescription)")
             errorMessage = error.localizedDescription
         }
     }

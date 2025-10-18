@@ -105,6 +105,12 @@
 "settings.privacy" = "นโยบายความเป็นส่วนตัว";
 "settings.terms" = "ข้อกำหนดการใช้งาน";
 "settings.support" = "สนับสนุน";
+"settings.on" = "เปิด";
+"settings.off" = "ปิด";
+"settings.enter_goal" = "ใส่เป้าหมายการดื่มน้ำรายวัน (มล.)";
+"settings.goal_updated" = "อัปเดตเป้าหมายรายวันสำเร็จ";
+"settings.unit_updated" = "อัปเดตหน่วยสำเร็จ";
+"settings.language_updated" = "เปลี่ยนภาษาสำเร็จ";
 
 /* User */
 "user.default_name" = "ผู้ใช้";

@@ -108,6 +108,12 @@
 "settings.privacy" = "Privacy Policy";
 "settings.terms" = "Terms of Service";
 "settings.support" = "Support";
+"settings.on" = "On";
+"settings.off" = "Off";
+"settings.enter_goal" = "Enter your daily water goal (ml)";
+"settings.goal_updated" = "Daily goal updated successfully";
+"settings.unit_updated" = "Unit updated successfully";
+"settings.language_updated" = "Language updated successfully";
 
 /* User */
 "user.default_name" = "User";
