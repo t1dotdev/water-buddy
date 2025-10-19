@@ -4,7 +4,7 @@ import Combine
 class AddWaterViewController: UIViewController {
     var viewModel: AddWaterViewModel!
     private var cancellables = Set<AnyCancellable>()
-    private var selectedAmount: Double = 250.0
+    private var selectedAmount: Double = 250.0 // Always stored in milliliters
 
     // MARK: - UI Components
     
@@ -33,7 +33,6 @@ class AddWaterViewController: UIViewController {
         label.font = FontManager.shared.title2
         label.textColor = Constants.Colors.textSecondary
         label.textAlignment = .center
-        label.text = "ml"
         return label
     }()
     
@@ -41,9 +40,16 @@ class AddWaterViewController: UIViewController {
     private lazy var amountSlider: UISlider = {
         let slider = UISlider()
         slider.translatesAutoresizingMaskIntoConstraints = false
-        slider.minimumValue = 50
-        slider.maximumValue = 1000
-        slider.value = 250
+        let unit = viewModel.user?.preferredUnit ?? .milliliters
+        if unit == .ounces {
+            slider.minimumValue = 1
+            slider.maximumValue = 32
+            slider.value = 8
+        } else {
+            slider.minimumValue = 50
+            slider.maximumValue = 1000
+            slider.value = 250
+        }
         slider.tintColor = Constants.Colors.primaryBlue
         slider.addTarget(self, action: #selector(sliderValueChanged), for: .valueChanged)
         return slider
@@ -96,7 +102,7 @@ class AddWaterViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
         button.layer.cornerRadius = 25
         button.addTarget(self, action: #selector(addWaterButtonTapped), for: .touchUpInside)
-        button.updateTitle(for: 250)
+        button.updateTitle(for: 250, unit: .milliliters)
         
         // Add shadow for depth
         button.layer.shadowColor = Constants.Colors.primaryBlue.cgColor
@@ -135,6 +141,52 @@ class AddWaterViewController: UIViewController {
         setupUI()
         setupBindings()
         setupNavigationBar()
+        setupNotifications()
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(preferredUnitUpdated),
+            name: Notification.Name("PreferredUnitUpdated"),
+            object: nil
+        )
+    }
+
+    @objc private func preferredUnitUpdated(_ notification: Notification) {
+        updateUnitLabels()
+        updateQuickAmountButtons()
+    }
+
+    private func updateUnitLabels() {
+        let unit = viewModel.user?.preferredUnit ?? .milliliters
+        unitLabel.text = unit.symbol
+
+        // Update slider range based on unit
+        if unit == .ounces {
+            amountSlider.minimumValue = 1
+            amountSlider.maximumValue = 32
+            amountSlider.value = 8
+            selectedAmount = 8 * 29.5735 // Convert to ml for storage
+            amountLabel.text = "8"
+        } else {
+            amountSlider.minimumValue = 50
+            amountSlider.maximumValue = 1000
+            amountSlider.value = 250
+            selectedAmount = 250
+            amountLabel.text = "250"
+        }
+    }
+
+    private func updateQuickAmountButtons() {
+        // Remove old buttons
+        quickAmountStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        // Recreate with new unit
+        setupQuickAmountButtons()
     }
 
     // MARK: - Setup Methods
@@ -162,23 +214,27 @@ class AddWaterViewController: UIViewController {
     }
 
     private func setupQuickAmountButtons() {
-        let amounts = [100, 250, 500, 750]
-        for amount in amounts {
-            let button = createQuickAmountButton(amount: Double(amount))
+        let unit = viewModel.user?.preferredUnit ?? .milliliters
+        let displayAmounts = Constants.WaterBuddy.getDisplayAmounts(for: unit).prefix(4)
+        let mlAmounts = Constants.WaterBuddy.getQuickAddAmounts(for: unit).prefix(4)
+
+        for (displayAmount, mlAmount) in zip(displayAmounts, mlAmounts) {
+            let button = createQuickAmountButton(displayAmount: displayAmount, mlAmount: mlAmount)
             quickAmountStackView.addArrangedSubview(button)
         }
     }
 
-    private func createQuickAmountButton(amount: Double) -> UIButton {
+    private func createQuickAmountButton(displayAmount: Double, mlAmount: Double) -> UIButton {
         let button = UIButton(type: .system)
-        button.setTitle("\(Int(amount))ml", for: .normal)
+        let unit = viewModel.user?.preferredUnit ?? .milliliters
+        button.setTitle("\(Int(displayAmount))\(unit.symbol)", for: .normal)
         button.backgroundColor = Constants.Colors.backgroundSecondary
         button.setTitleColor(Constants.Colors.primaryBlue, for: .normal)
         button.titleLabel?.font = FontManager.shared.subheadline
         button.layer.cornerRadius = 12
         button.layer.borderWidth = 2
         button.layer.borderColor = Constants.Colors.primaryBlue.withAlphaComponent(0.2).cgColor
-        button.tag = Int(amount)
+        button.tag = Int(mlAmount) // Store ml amount in tag for retrieval
         button.addTarget(self, action: #selector(quickAmountTapped(_:)), for: .touchUpInside)
         return button
     }
@@ -272,15 +328,36 @@ class AddWaterViewController: UIViewController {
                 self?.viewModel.clearSuccess()
             }
             .store(in: &cancellables)
+
+        viewModel.$user
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.updateUnitLabels()
+                self.updateQuickAmountButtons()
+                // Update main button title with current amount
+                let unit = self.viewModel.user?.preferredUnit ?? .milliliters
+                self.addWaterButton.updateTitle(for: Float(self.selectedAmount), unit: unit)
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Actions
 
     @objc private func sliderValueChanged() {
-        let value = round(amountSlider.value / 10) * 10 // Round to nearest 10
-        selectedAmount = Double(value)
+        let unit = viewModel.user?.preferredUnit ?? .milliliters
+        let value: Float
+
+        if unit == .ounces {
+            value = round(amountSlider.value) // Round to nearest whole number for oz
+            selectedAmount = Double(value) * 29.5735 // Convert to ml for storage
+        } else {
+            value = round(amountSlider.value / 10) * 10 // Round to nearest 10 for ml
+            selectedAmount = Double(value)
+        }
+
         amountLabel.text = "\(Int(value))"
-        addWaterButton.updateTitle(for: value)
+        addWaterButton.updateTitle(for: value, unit: unit)
         
         // Haptic feedback
         let generator = UIImpactFeedbackGenerator(style: .light)
@@ -289,11 +366,22 @@ class AddWaterViewController: UIViewController {
     }
 
     @objc private func quickAmountTapped(_ sender: UIButton) {
-        let amount = Double(sender.tag)
-        selectedAmount = amount
-        amountSlider.value = Float(amount)
-        amountLabel.text = "\(Int(amount))"
-        addWaterButton.updateTitle(for: Float(amount))
+        let mlAmount = Double(sender.tag) // Tag stores ml amount
+        selectedAmount = mlAmount
+
+        let unit = viewModel.user?.preferredUnit ?? .milliliters
+        let displayValue: Double
+
+        if unit == .ounces {
+            displayValue = mlAmount * 0.033814 // Convert ml to oz for display
+            amountSlider.value = Float(displayValue)
+        } else {
+            displayValue = mlAmount
+            amountSlider.value = Float(mlAmount)
+        }
+
+        amountLabel.text = "\(Int(displayValue))"
+        addWaterButton.updateTitle(for: Float(displayValue), unit: unit)
         
         // Animate button selection
         UIView.animate(withDuration: 0.1, animations: {
@@ -379,10 +467,20 @@ class AddWaterViewController: UIViewController {
     
     private func resetForm() {
         // Reset to default values for next time user opens the Add Water tab
-        selectedAmount = 250
-        amountSlider.value = 250
-        amountLabel.text = "250"
-        addWaterButton.updateTitle(for: 250)
+        let unit = viewModel.user?.preferredUnit ?? .milliliters
+
+        if unit == .ounces {
+            selectedAmount = 8 * 29.5735 // 8oz in ml
+            amountSlider.value = 8
+            amountLabel.text = "8"
+            addWaterButton.updateTitle(for: 8, unit: unit)
+        } else {
+            selectedAmount = 250
+            amountSlider.value = 250
+            amountLabel.text = "250"
+            addWaterButton.updateTitle(for: 250, unit: unit)
+        }
+
         containerSegmentedControl.selectedSegmentIndex = 0
         viewModel.selectedContainer = .glass
     }
@@ -391,9 +489,9 @@ class AddWaterViewController: UIViewController {
 // MARK: - UIButton Extension
 
 extension UIButton {
-    func updateTitle(for amount: Float) {
-        let title = NSLocalizedString("add_water.add_button", value: "Add %d ml", comment: "")
-        self.setTitle(String(format: title, Int(amount)), for: .normal)
+    func updateTitle(for amount: Float, unit: WaterUnit = .milliliters) {
+        let title = String(format: NSLocalizedString("add_water.add_button_format", value: "Add %d %@", comment: ""), Int(amount), unit.symbol)
+        self.setTitle(title, for: .normal)
     }
     
     func animatePress() {

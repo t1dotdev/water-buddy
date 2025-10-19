@@ -77,8 +77,9 @@ class HomeViewModel: ObservableObject {
                 dailyIntake += amount
                 calculateProgress()
 
-                // Reload data to get updated stats
+                // Reload data to get updated stats, streak, and weekly overview
                 await loadTodayStats()
+                await loadUserAndWeeklyData()
 
             } catch {
                 errorMessage = error.localizedDescription
@@ -141,14 +142,31 @@ class HomeViewModel: ObservableObject {
         }
     }
 
+    private func loadUserAndWeeklyData() async {
+        do {
+            async let userData = getUserDataUseCase.execute()
+            async let weeklyTrend = getStatisticsUseCase.getDailyTrend(days: 7)
+
+            let (loadedUser, trend) = try await (userData, weeklyTrend)
+
+            self.user = loadedUser
+            self.streakCount = loadedUser.streakCount
+            self.lastSevenDays = trend
+        } catch {
+            print("Failed to load user and weekly data: \(error.localizedDescription)")
+        }
+    }
+
     // MARK: - Computed Properties
 
     var formattedDailyIntake: String {
-        return String(format: "%.0f ml", dailyIntake)
+        let unit = user?.preferredUnit ?? .milliliters
+        return String(format: "%.0f %@", dailyIntake, unit.symbol)
     }
 
     var formattedDailyGoal: String {
-        return String(format: "%.0f ml", dailyGoal)
+        let unit = user?.preferredUnit ?? .milliliters
+        return String(format: "%.0f %@", dailyGoal, unit.symbol)
     }
 
     var formattedPercentage: String {
@@ -160,7 +178,8 @@ class HomeViewModel: ObservableObject {
     }
 
     var formattedRemainingAmount: String {
-        return String(format: "%.0f ml", remainingAmount)
+        let unit = user?.preferredUnit ?? .milliliters
+        return String(format: "%.0f %@", remainingAmount, unit.symbol)
     }
 
     var isGoalAchieved: Bool {
@@ -183,7 +202,8 @@ class HomeViewModel: ObservableObject {
     }
 
     var formattedRecommendedGoal: String {
-        return String(format: "%.0f ml", recommendedDailyGoal)
+        let unit = user?.preferredUnit ?? .milliliters
+        return String(format: "%.0f %@", recommendedDailyGoal, unit.symbol)
     }
 
     var motivationalMessage: String {

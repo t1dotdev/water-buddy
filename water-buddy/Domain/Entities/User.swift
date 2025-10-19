@@ -17,6 +17,7 @@ class User {
     var profileImageData: Data?
     var createdDate: Date
     var lastActiveDate: Date
+    var lastStreakUpdateDate: Date?
 
     init(
         id: UUID = UUID(),
@@ -32,7 +33,8 @@ class User {
         reminderTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date(), // 9:00 AM
         profileImageData: Data? = nil,
         createdDate: Date = Date(),
-        lastActiveDate: Date = Date()
+        lastActiveDate: Date = Date(),
+        lastStreakUpdateDate: Date? = nil
     ) {
         self.id = id
         self.name = name
@@ -48,6 +50,7 @@ class User {
         self.profileImageData = profileImageData
         self.createdDate = createdDate
         self.lastActiveDate = lastActiveDate
+        self.lastStreakUpdateDate = lastStreakUpdateDate
     }
 
     // MARK: - Computed Properties
@@ -72,10 +75,17 @@ class User {
 
     func incrementStreak() {
         streakCount += 1
+        lastStreakUpdateDate = Date()
     }
 
     func resetStreak() {
         streakCount = 0
+        lastStreakUpdateDate = nil
+    }
+
+    func setStreak(_ count: Int) {
+        streakCount = count
+        lastStreakUpdateDate = count > 0 ? Date() : nil
     }
 
     func shouldShowReminder(at date: Date) -> Bool {

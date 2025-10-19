@@ -64,11 +64,39 @@ struct Constants {
         static let minAmount: Double = 1.0
         static let maxAmount: Double = 5000.0
 
-        static let quickAddAmounts: [Double] = [100, 250, 500, 750, 1000]
+        // Quick add amounts in milliliters
+        static let quickAddAmountsML: [Double] = [100, 250, 500, 750, 1000]
+
+        // Quick add amounts in ounces (common bottle sizes)
+        static let quickAddAmountsOZ: [Double] = [4, 8, 12, 16, 20]
+
+        // Legacy property for backward compatibility
+        static let quickAddAmounts: [Double] = quickAddAmountsML
 
         static let defaultReminderInterval: TimeInterval = 3600 // 1 hour
         static let minReminderInterval: TimeInterval = 1800 // 30 minutes
         static let maxReminderInterval: TimeInterval = 28800 // 8 hours
+
+        // Get quick add amounts for a specific unit (returns amounts in milliliters)
+        static func getQuickAddAmounts(for unit: WaterUnit) -> [Double] {
+            switch unit {
+            case .milliliters:
+                return quickAddAmountsML
+            case .ounces:
+                // Convert oz amounts to ml for storage
+                return quickAddAmountsOZ.map { $0 * 29.5735 }
+            }
+        }
+
+        // Get display amounts for a specific unit (for showing in UI)
+        static func getDisplayAmounts(for unit: WaterUnit) -> [Double] {
+            switch unit {
+            case .milliliters:
+                return quickAddAmountsML
+            case .ounces:
+                return quickAddAmountsOZ
+            }
+        }
     }
 
     // MARK: - Tab Bar

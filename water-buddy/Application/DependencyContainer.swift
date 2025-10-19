@@ -114,7 +114,8 @@ class DependencyContainer {
     @MainActor
     func makeAddWaterViewModel() -> AddWaterViewModel {
         return AddWaterViewModel(
-            addWaterUseCase: addWaterUseCase
+            addWaterUseCase: addWaterUseCase,
+            getUserDataUseCase: getUserDataUseCase
         )
     }
 

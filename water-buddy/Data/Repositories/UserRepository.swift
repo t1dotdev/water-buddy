@@ -88,9 +88,9 @@ class UserRepository: UserRepositoryProtocol {
 
     func updateStreakCount(_ count: Int) async throws {
         let user = try await getUser()
-        user.streakCount = count
+        user.setStreak(count)
         try modelContext.save()
-        print("✅ Streak count updated and saved")
+        print("✅ Streak count updated to \(count) and saved")
     }
 
     func updateProfileImage(_ imageData: Data?) async throws {

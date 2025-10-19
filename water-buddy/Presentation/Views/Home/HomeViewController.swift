@@ -305,13 +305,21 @@ class HomeViewController: UIViewController {
     }
 
     private func setupQuickAddButtons() {
-        let amounts = Constants.WaterBuddy.quickAddAmounts.prefix(3)
+        let unit = viewModel.user?.preferredUnit ?? .milliliters
+        let mlAmounts = Constants.WaterBuddy.getQuickAddAmounts(for: unit).prefix(3)
+        let displayAmounts = Constants.WaterBuddy.getDisplayAmounts(for: unit).prefix(3)
 
-        for amount in amounts {
-            let button = QuickAddButton(amount: amount)
+        for (mlAmount, displayAmount) in zip(mlAmounts, displayAmounts) {
+            let button = QuickAddButton(amount: mlAmount, displayAmount: displayAmount, unit: unit)
             button.addTarget(self, action: #selector(quickAddButtonTapped), for: .touchUpInside)
             quickAddStackView.addArrangedSubview(button)
         }
+    }
+
+    private func updateQuickAddButtonUnits() {
+        // Remove old buttons and recreate with new amounts
+        quickAddStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        setupQuickAddButtons()
     }
 
     private func setupRefreshControl() {
@@ -482,11 +490,18 @@ class HomeViewController: UIViewController {
             name: Notification.Name("WaterIntakeUpdated"),
             object: nil
         )
-        
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(dailyGoalUpdated),
             name: Notification.Name("DailyGoalUpdated"),
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(preferredUnitUpdated),
+            name: Notification.Name("PreferredUnitUpdated"),
             object: nil
         )
     }
@@ -575,6 +590,13 @@ class HomeViewController: UIViewController {
             .compactMap { $0 }
             .sink { [weak self] error in
                 self?.showAlert(title: NSLocalizedString("alert.error", value: "Error", comment: ""), message: error)
+            }
+            .store(in: &cancellables)
+
+        viewModel.$user
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateQuickAddButtonUnits()
             }
             .store(in: &cancellables)
     }
@@ -668,6 +690,17 @@ class HomeViewController: UIViewController {
                 self.progressCircleView.transform = .identity
             }
         }
+    }
+
+    @objc private func preferredUnitUpdated(_ notification: Notification) {
+        // Reload data to update all unit displays
+        viewModel.loadData()
+
+        // Update quick add buttons
+        updateQuickAddButtonUnits()
+
+        // Update progress view
+        updateProgressView()
     }
 
     // MARK: - Private Methods

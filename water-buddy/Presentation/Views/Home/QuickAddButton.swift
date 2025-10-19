@@ -1,7 +1,8 @@
 import UIKit
 
 class QuickAddButton: UIButton {
-    let amount: Double
+    let amount: Double // Amount in milliliters (for storage)
+    private var displayAmount: Double // Amount to display
 
     private lazy var amountLabel: UILabel = {
         let label = UILabel()
@@ -18,7 +19,6 @@ class QuickAddButton: UIButton {
         label.font = FontManager.shared.caption1
         label.textColor = Constants.Colors.textSecondary
         label.textAlignment = .center
-        label.text = "ml"
         return label
     }()
 
@@ -31,10 +31,18 @@ class QuickAddButton: UIButton {
         return imageView
     }()
 
-    init(amount: Double) {
-        self.amount = amount
+    init(amount: Double, displayAmount: Double? = nil, unit: WaterUnit = .milliliters) {
+        self.amount = amount // Always in ml
+        self.displayAmount = displayAmount ?? amount
         super.init(frame: .zero)
         setupButton()
+        unitLabel.text = unit.symbol
+    }
+
+    func updateUnit(_ unit: WaterUnit, displayAmount: Double) {
+        self.displayAmount = displayAmount
+        unitLabel.text = unit.symbol
+        amountLabel.text = "\(Int(displayAmount))"
     }
 
     required init?(coder: NSCoder) {
@@ -68,7 +76,7 @@ class QuickAddButton: UIButton {
         addSubview(amountLabel)
         addSubview(unitLabel)
 
-        amountLabel.text = "\(Int(amount))"
+        amountLabel.text = "\(Int(displayAmount))"
 
         NSLayoutConstraint.activate([
             heightAnchor.constraint(equalToConstant: Constants.Dimensions.quickAddButtonSize),

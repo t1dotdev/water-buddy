@@ -5,8 +5,7 @@ class WeatherView: UIView {
     private lazy var containerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = Constants.Colors.backgroundSecondary
-        view.layer.cornerRadius = Constants.Dimensions.cornerRadius
+        view.backgroundColor = .clear
         return view
     }()
 
@@ -31,7 +30,7 @@ class WeatherView: UIView {
     private lazy var temperatureLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = FontManager.shared.title1
+        label.font = FontManager.shared.body
         label.textColor = Constants.Colors.primaryBlue
         label.textAlignment = .right
         label.text = "--°C"

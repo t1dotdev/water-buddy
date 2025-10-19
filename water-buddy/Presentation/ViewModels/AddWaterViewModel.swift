@@ -9,18 +9,32 @@ class AddWaterViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var successMessage: String?
     @Published var recentAmounts: [Double] = []
+    @Published var user: User?
 
     private let addWaterUseCase: AddWaterUseCase
+    private let getUserDataUseCase: GetUserDataUseCase
     private var cancellables = Set<AnyCancellable>()
 
     // Quick add amounts
     let quickAmounts = Constants.WaterBuddy.quickAddAmounts
     let containers = ContainerType.allCases
 
-    init(addWaterUseCase: AddWaterUseCase) {
+    init(addWaterUseCase: AddWaterUseCase, getUserDataUseCase: GetUserDataUseCase) {
         self.addWaterUseCase = addWaterUseCase
+        self.getUserDataUseCase = getUserDataUseCase
         loadRecentAmounts()
         setupValidation()
+        Task {
+            await loadUserData()
+        }
+    }
+
+    private func loadUserData() async {
+        do {
+            user = try await getUserDataUseCase.execute()
+        } catch {
+            print("Failed to load user data: \(error.localizedDescription)")
+        }
     }
 
     // MARK: - Public Methods
@@ -33,8 +47,9 @@ class AddWaterViewModel: ObservableObject {
 
             do {
                 let entry = try await addWaterUseCase.execute(amount: amount, container: selectedContainer)
-                successMessage = NSLocalizedString("add_water.success",
-                    value: "Added \(Int(amount))ml successfully!", comment: "")
+                let unit = user?.preferredUnit ?? .milliliters
+                successMessage = String(format: NSLocalizedString("add_water.success_format",
+                    value: "Added \(Int(amount))\(unit.symbol) successfully!", comment: ""), Int(amount), unit.symbol)
 
                 // Add to recent amounts
                 addToRecentAmounts(amount)
@@ -59,8 +74,9 @@ class AddWaterViewModel: ObservableObject {
 
     func addCustomAmount() {
         guard let amount = Double(customAmount), isValidAmount(amount) else {
-            errorMessage = NSLocalizedString("add_water.invalid_amount",
-                value: "Please enter a valid amount between 1-5000ml", comment: "")
+            let unit = user?.preferredUnit ?? .milliliters
+            errorMessage = String(format: NSLocalizedString("add_water.invalid_amount_format",
+                value: "Please enter a valid amount between 1-5000%@", comment: ""), unit.symbol)
             return
         }
 
@@ -137,7 +153,8 @@ class AddWaterViewModel: ObservableObject {
 
     var containerAmountText: String {
         let amount = selectedContainerAmount
-        return amount > 0 ? "\(Int(amount))ml" : NSLocalizedString("container.custom_amount", value: "Custom", comment: "")
+        let unit = user?.preferredUnit ?? .milliliters
+        return amount > 0 ? "\(Int(amount))\(unit.symbol)" : NSLocalizedString("container.custom_amount", value: "Custom", comment: "")
     }
 
     var hasRecentAmounts: Bool {
@@ -145,7 +162,8 @@ class AddWaterViewModel: ObservableObject {
     }
 
     func formattedAmount(_ amount: Double) -> String {
-        return "\(Int(amount))ml"
+        let unit = user?.preferredUnit ?? .milliliters
+        return "\(Int(amount))\(unit.symbol)"
     }
 
     // MARK: - Validation Methods

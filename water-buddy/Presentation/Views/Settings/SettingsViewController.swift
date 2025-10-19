@@ -157,10 +157,12 @@ class SettingsViewController: UIViewController {
 
     private func showDailyGoalPicker() {
         let currentGoal = viewModel.user?.dailyGoal ?? 2000.0
+        let unit = viewModel.user?.preferredUnit ?? .milliliters
+        let message = String(format: NSLocalizedString("settings.enter_goal_format", value: "Enter your daily water goal (%@)", comment: ""), unit.symbol)
 
         showTextInputAlert(
             title: NSLocalizedString("settings.daily_goal", value: "Daily Goal", comment: ""),
-            message: NSLocalizedString("settings.enter_goal", value: "Enter your daily water goal (ml)", comment: ""),
+            message: message,
             placeholder: "2000",
             currentText: "\(Int(currentGoal))",
             keyboardType: .numberPad
@@ -313,7 +315,8 @@ extension SettingsViewController: UITableViewDataSource, UITableViewDelegate {
         switch item.type {
         case .dailyGoal:
             let goal = viewModel.user?.dailyGoal ?? 2000.0
-            cell.detailTextLabel?.text = "\(Int(goal))ml"
+            let unit = viewModel.user?.preferredUnit ?? .milliliters
+            cell.detailTextLabel?.text = "\(Int(goal))\(unit.symbol)"
             cell.accessoryType = .disclosureIndicator
         case .units:
             let unit = viewModel.user?.preferredUnit ?? .milliliters

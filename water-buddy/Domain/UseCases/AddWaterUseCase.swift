@@ -39,26 +39,47 @@ class AddWaterUseCaseImpl: AddWaterUseCase {
         try await userRepository.updateLastActiveDate()
 
         // Check if daily goal is achieved and update streak
-        let todayStats = try await waterRepository.getStatistics(for: Date())
-        if todayStats.goalAchieved {
-            let alreadyAchieved = await isGoalAlreadyAchievedToday(todayStats)
-            if !alreadyAchieved {
-                try await userRepository.incrementStreak()
-            }
-        }
+        try await updateStreakIfNeeded(user: user)
 
         return entry
     }
 
-    private func isGoalAlreadyAchievedToday(_ stats: HydrationStatistics) async -> Bool {
-        // Check if this is the first time achieving goal today
+    private func updateStreakIfNeeded(user: User) async throws {
         let calendar = Calendar.current
         let today = Date()
-        let todayEntries = try? await waterRepository.getEntries(for: today)
 
-        // Calculate intake before this entry
-        let previousIntake = (todayEntries?.reduce(0) { $0 + $1.amount } ?? 0) - stats.totalIntake
-        return previousIntake >= 2000.0 // Assuming 2L default goal
+        // Get today's total intake
+        let todayIntake = try await waterRepository.getTotalIntakeForDate(today)
+
+        // Check if goal is achieved
+        guard todayIntake >= user.dailyGoal else {
+            return // Goal not achieved yet
+        }
+
+        // Check if we already updated streak today
+        if let lastUpdate = user.lastStreakUpdateDate,
+           calendar.isDate(lastUpdate, inSameDayAs: today) {
+            return // Already updated today
+        }
+
+        // Check if this is a consecutive day
+        if let lastUpdate = user.lastStreakUpdateDate {
+            let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+
+            if calendar.isDate(lastUpdate, inSameDayAs: yesterday) {
+                // Consecutive day - increment streak
+                try await userRepository.incrementStreak()
+            } else if calendar.isDate(lastUpdate, inSameDayAs: today) {
+                // Already updated today - do nothing
+                return
+            } else {
+                // Missed days - reset streak to 1
+                try await userRepository.updateStreakCount(1)
+            }
+        } else {
+            // First time achieving goal - set streak to 1
+            try await userRepository.updateStreakCount(1)
+        }
     }
 }
 

@@ -15,7 +15,7 @@ class CircularProgressView: UIView {
         label.font = FontManager.shared.waterAmount
         label.textColor = Constants.Colors.primaryBlue
         label.textAlignment = .center
-        label.text = "0ml"
+        label.text = "0"
         return label
     }()
 
@@ -25,7 +25,7 @@ class CircularProgressView: UIView {
         label.font = FontManager.shared.subheadline
         label.textColor = Constants.Colors.textSecondary
         label.textAlignment = .center
-        label.text = "of 2000ml"
+        label.text = ""
         return label
     }()
 
