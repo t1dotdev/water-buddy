@@ -172,6 +172,9 @@
 "error.invalid_interval" = "ช่วงเวลาแจ้งเตือนต้องอยู่ระหว่าง 30 นาที ถึง 8 ชั่วโมง";
 "error.image_too_large" = "ขนาดรูปภาพต้องน้อยกว่า 5MB";
 "error.data_corrupted" = "ข้อมูลเสียหาย กรุณาลองรีเซ็ตข้อมูลแอป";
+"error.goal_too_small" = "เป้าหมายรายวันต้องมากกว่า 0";
+"error.goal_too_large" = "เป้าหมายรายวันต้องไม่เกิน 10000%@";
+"error.invalid_goal_input" = "กรุณาใส่ตัวเลขที่ถูกต้อง";
 
 /* Location Errors */
 "error.location.denied" = "ไม่อนุญาตการเข้าถึงตำแหน่ง";

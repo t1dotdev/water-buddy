@@ -167,10 +167,40 @@ class SettingsViewController: UIViewController {
             currentText: "\(Int(currentGoal))",
             keyboardType: .numberPad
         ) { [weak self] text in
-            if let goal = Double(text), goal > 0 && goal <= 10000 {
-                Task {
-                    await self?.viewModel.updateDailyGoal(goal)
-                }
+            guard let self = self else { return }
+
+            // Check if input is a valid number
+            guard let goal = Double(text) else {
+                self.showAlert(
+                    title: NSLocalizedString("alert.error", value: "Error", comment: ""),
+                    message: NSLocalizedString("error.invalid_goal_input", value: "Please enter a valid number", comment: "")
+                )
+                return
+            }
+
+            // Check if goal is too small
+            if goal <= 0 {
+                self.showAlert(
+                    title: NSLocalizedString("alert.error", value: "Error", comment: ""),
+                    message: NSLocalizedString("error.goal_too_small", value: "Daily goal must be greater than 0", comment: "")
+                )
+                return
+            }
+
+            // Check if goal is too large
+            if goal > 10000 {
+                let unit = self.viewModel.user?.preferredUnit ?? .milliliters
+                let message = String(format: NSLocalizedString("error.goal_too_large", value: "Daily goal cannot exceed 10000%@", comment: ""), unit.symbol)
+                self.showAlert(
+                    title: NSLocalizedString("alert.error", value: "Error", comment: ""),
+                    message: message
+                )
+                return
+            }
+
+            // Valid goal - update it
+            Task {
+                await self.viewModel.updateDailyGoal(goal)
             }
         }
     }
