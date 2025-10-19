@@ -761,6 +761,4 @@ class HomeViewController: UIViewController {
             // Confetti will auto-remove after animation
         }
     }
-
-
 }
