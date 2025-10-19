@@ -22,23 +22,12 @@ class HomeViewController: UIViewController {
     private lazy var progressCardView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = Constants.Colors.backgroundSecondary
+        view.backgroundColor = .clear
         view.layer.cornerRadius = Constants.Dimensions.cornerRadius
         view.layer.shadowColor = Constants.Colors.shadow.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 8)
         view.layer.shadowRadius = 16
-        view.layer.shadowOpacity = 0.12
-        
-        // Add gradient background
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [
-            UIColor.systemBlue.withAlphaComponent(0.05).cgColor,
-            UIColor.systemBlue.withAlphaComponent(0.02).cgColor
-        ]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
-        gradientLayer.cornerRadius = Constants.Dimensions.cornerRadius
-        view.layer.insertSublayer(gradientLayer, at: 0)
+        view.layer.shadowOpacity = 0.0
         
         return view
     }()
@@ -52,7 +41,7 @@ class HomeViewController: UIViewController {
     private lazy var progressTitleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = FontManager.shared.title3
+        label.font = FontManager.shared.title2
         label.textColor = Constants.Colors.textPrimary
         label.text = NSLocalizedString("home.progress.title", value: "Today's Progress", comment: "")
         return label
@@ -73,24 +62,7 @@ class HomeViewController: UIViewController {
         return view
     }()
 
-    private lazy var greetingLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = FontManager.shared.title2
-        label.textColor = Constants.Colors.textPrimary
-        label.textAlignment = .left
-        return label
-    }()
 
-    private lazy var timeBasedMessageLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = FontManager.shared.callout
-        label.textColor = Constants.Colors.textSecondary
-        label.textAlignment = .left
-        label.numberOfLines = 2
-        return label
-    }()
 
     private lazy var statsCardView: UIView = {
         let view = UIView()
@@ -395,8 +367,6 @@ class HomeViewController: UIViewController {
         view.addSubview(loadingIndicator)
         scrollView.addSubview(contentView)
 
-        contentView.addSubview(greetingLabel)
-        contentView.addSubview(timeBasedMessageLabel)
         contentView.addSubview(progressCardView)
         contentView.addSubview(statsCardView)
         contentView.addSubview(quickAddContainerView)
@@ -463,23 +433,16 @@ class HomeViewController: UIViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
 
-            // Greeting section
-            greetingLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.Dimensions.paddingLarge),
-            greetingLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingLarge),
-            greetingLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingLarge),
-
-            timeBasedMessageLabel.topAnchor.constraint(equalTo: greetingLabel.bottomAnchor, constant: 6),
-            timeBasedMessageLabel.leadingAnchor.constraint(equalTo: greetingLabel.leadingAnchor),
-            timeBasedMessageLabel.trailingAnchor.constraint(equalTo: greetingLabel.trailingAnchor),
+            // Top spacing since greeting removed
+            progressCardView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.Dimensions.paddingMedium),
 
             // Progress card
-            progressCardView.topAnchor.constraint(equalTo: timeBasedMessageLabel.bottomAnchor, constant: Constants.Dimensions.paddingLarge),
-            progressCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingLarge),
-            progressCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingLarge),
+            progressCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
+            progressCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
 
-            progressCardHeader.topAnchor.constraint(equalTo: progressCardView.topAnchor, constant: Constants.Dimensions.paddingLarge),
-            progressCardHeader.leadingAnchor.constraint(equalTo: progressCardView.leadingAnchor, constant: Constants.Dimensions.paddingLarge),
-            progressCardHeader.trailingAnchor.constraint(equalTo: progressCardView.trailingAnchor, constant: -Constants.Dimensions.paddingLarge),
+            progressCardHeader.topAnchor.constraint(equalTo: progressCardView.topAnchor, constant: Constants.Dimensions.paddingMedium),
+            progressCardHeader.leadingAnchor.constraint(equalTo: progressCardView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
+            progressCardHeader.trailingAnchor.constraint(equalTo: progressCardView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
             
             progressTitleLabel.topAnchor.constraint(equalTo: progressCardHeader.topAnchor),
             progressTitleLabel.leadingAnchor.constraint(equalTo: progressCardHeader.leadingAnchor),
@@ -494,12 +457,12 @@ class HomeViewController: UIViewController {
             progressCircleView.centerXAnchor.constraint(equalTo: progressCardView.centerXAnchor),
             progressCircleView.widthAnchor.constraint(equalToConstant: Constants.Dimensions.progressCircleSize),
             progressCircleView.heightAnchor.constraint(equalToConstant: Constants.Dimensions.progressCircleSize),
-            progressCircleView.bottomAnchor.constraint(equalTo: progressCardView.bottomAnchor, constant: -Constants.Dimensions.paddingLarge),
+            progressCircleView.bottomAnchor.constraint(equalTo: progressCardView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             // Stats card
-            statsCardView.topAnchor.constraint(equalTo: progressCardView.bottomAnchor, constant: Constants.Dimensions.paddingLarge),
-            statsCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingLarge),
-            statsCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingLarge),
+            statsCardView.topAnchor.constraint(equalTo: progressCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
+            statsCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
+            statsCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             statsHeaderView.topAnchor.constraint(equalTo: statsCardView.topAnchor, constant: Constants.Dimensions.paddingMedium),
             statsHeaderView.leadingAnchor.constraint(equalTo: statsCardView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
@@ -520,9 +483,9 @@ class HomeViewController: UIViewController {
             streakView.bottomAnchor.constraint(equalTo: statsCardView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             // Quick add section
-            quickAddContainerView.topAnchor.constraint(equalTo: statsCardView.bottomAnchor, constant: Constants.Dimensions.paddingLarge),
-            quickAddContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingLarge),
-            quickAddContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingLarge),
+            quickAddContainerView.topAnchor.constraint(equalTo: statsCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
+            quickAddContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
+            quickAddContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             quickAddHeaderView.topAnchor.constraint(equalTo: quickAddContainerView.topAnchor, constant: Constants.Dimensions.paddingMedium),
             quickAddHeaderView.leadingAnchor.constraint(equalTo: quickAddContainerView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
@@ -543,9 +506,9 @@ class HomeViewController: UIViewController {
             quickAddStackView.bottomAnchor.constraint(equalTo: quickAddContainerView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             // Weather card
-            weatherCardView.topAnchor.constraint(equalTo: quickAddContainerView.bottomAnchor, constant: Constants.Dimensions.paddingLarge),
-            weatherCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingLarge),
-            weatherCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingLarge),
+            weatherCardView.topAnchor.constraint(equalTo: quickAddContainerView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
+            weatherCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
+            weatherCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             weatherHeaderView.topAnchor.constraint(equalTo: weatherCardView.topAnchor, constant: Constants.Dimensions.paddingMedium),
             weatherHeaderView.leadingAnchor.constraint(equalTo: weatherCardView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
@@ -566,9 +529,9 @@ class HomeViewController: UIViewController {
             weatherView.bottomAnchor.constraint(equalTo: weatherCardView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             // Chart card
-            chartCardView.topAnchor.constraint(equalTo: weatherCardView.bottomAnchor, constant: Constants.Dimensions.paddingLarge),
-            chartCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingLarge),
-            chartCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingLarge),
+            chartCardView.topAnchor.constraint(equalTo: weatherCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
+            chartCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
+            chartCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             chartHeaderView.topAnchor.constraint(equalTo: chartCardView.topAnchor, constant: Constants.Dimensions.paddingMedium),
             chartHeaderView.leadingAnchor.constraint(equalTo: chartCardView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
@@ -590,11 +553,11 @@ class HomeViewController: UIViewController {
             weeklyChartView.bottomAnchor.constraint(equalTo: chartCardView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             // Motivation label
-            motivationLabel.topAnchor.constraint(equalTo: chartCardView.bottomAnchor, constant: Constants.Dimensions.paddingLarge),
-            motivationLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingLarge),
-            motivationLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingLarge),
+            motivationLabel.topAnchor.constraint(equalTo: chartCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
+            motivationLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
+            motivationLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
             motivationLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 60),
-            motivationLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Constants.Dimensions.paddingLarge),
+            motivationLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             // Loading indicator
             loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -640,12 +603,6 @@ class HomeViewController: UIViewController {
             }
             .store(in: &cancellables)
 
-        viewModel.$user
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] user in
-                self?.updateGreeting(for: user)
-            }
-            .store(in: &cancellables)
 
         viewModel.$percentage
             .receive(on: DispatchQueue.main)
@@ -815,34 +772,6 @@ class HomeViewController: UIViewController {
 
     // MARK: - Private Methods
 
-    private func updateGreeting(for user: User?) {
-        guard let user = user else { return }
-
-        let hour = Calendar.current.component(.hour, from: Date())
-        let greetingTime: String
-        let contextualMessage: String
-
-        switch hour {
-        case 5..<12:
-            greetingTime = NSLocalizedString("greeting.morning", value: "Good Morning", comment: "")
-            contextualMessage = NSLocalizedString("message.morning", value: "Start your day with hydration", comment: "")
-        case 12..<17:
-            greetingTime = NSLocalizedString("greeting.afternoon", value: "Good Afternoon", comment: "")
-            contextualMessage = NSLocalizedString("message.afternoon", value: "Keep up the great work", comment: "")
-        case 17..<22:
-            greetingTime = NSLocalizedString("greeting.evening", value: "Good Evening", comment: "")
-            contextualMessage = NSLocalizedString("message.evening", value: "Don't forget to hydrate", comment: "")
-        default:
-            greetingTime = NSLocalizedString("greeting.night", value: "Good Night", comment: "")
-            contextualMessage = NSLocalizedString("message.night", value: "Rest well, hydrate tomorrow", comment: "")
-        }
-
-        greetingLabel.text = "\(greetingTime), \(user.name)!"
-        timeBasedMessageLabel.text = contextualMessage
-        
-        // Add subtle text animation
-        animateGreetingLabels()
-    }
     
     // MARK: - Animation Methods
     
@@ -867,22 +796,5 @@ class HomeViewController: UIViewController {
         }
     }
     
-    private func animateGreetingLabels() {
-        UIView.animate(
-            withDuration: 0.5,
-            delay: 0,
-            options: [.allowUserInteraction],
-            animations: {
-                self.greetingLabel.transform = CGAffineTransform(scaleX: 1.02, y: 1.02)
-            }
-        ) { _ in
-            UIView.animate(
-                withDuration: 0.3,
-                animations: {
-                    self.greetingLabel.transform = .identity
-                }
-            )
-        }
-    }
 
 }
