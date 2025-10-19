@@ -64,7 +64,8 @@ class AddWaterUseCaseImpl: AddWaterUseCase {
             DispatchQueue.main.async {
                 NotificationCenter.default.post(
                     name: NSNotification.Name("GoalCompletedNotification"),
-                    object: nil
+                    object: nil,
+                    userInfo: ["intake": intakeAfter]
                 )
             }
         }

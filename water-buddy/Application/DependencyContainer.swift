@@ -122,7 +122,8 @@ class DependencyContainer {
     @MainActor
     func makeHistoryViewModel() -> HistoryViewModel {
         return HistoryViewModel(
-            waterRepository: waterRepository
+            waterRepository: waterRepository,
+            getUserDataUseCase: getUserDataUseCase
         )
     }
 

@@ -170,16 +170,21 @@ class AddWaterViewController: UIViewController {
     }
 
     @objc private func goalCompleted(_ notification: Notification) {
-        // Check if we should show confetti for today
-        guard ConfettiTracker.shared.shouldShowConfetti else {
+        // Extract intake amount from notification
+        guard let intake = notification.userInfo?["intake"] as? Double else {
+            return
+        }
+
+        // Check if we should show confetti for this intake level
+        guard ConfettiTracker.shared.shouldShowConfetti(currentIntake: intake) else {
             return
         }
 
         // Show confetti animation
         showConfetti()
 
-        // Mark confetti as shown for today
-        ConfettiTracker.shared.markConfettiShown()
+        // Mark confetti as shown with current intake
+        ConfettiTracker.shared.markConfettiShown(intake: intake)
     }
 
     private func updateUnitLabels() {
