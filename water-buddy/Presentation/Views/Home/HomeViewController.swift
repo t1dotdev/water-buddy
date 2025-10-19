@@ -690,6 +690,15 @@ class HomeViewController: UIViewController {
             }
             .store(in: &cancellables)
 
+        viewModel.$currentTemperature
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] temperature in
+                if temperature > 0 {
+                    self?.weatherView.setTemperature(temperature)
+                }
+            }
+            .store(in: &cancellables)
+
         viewModel.$lastSevenDays
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in

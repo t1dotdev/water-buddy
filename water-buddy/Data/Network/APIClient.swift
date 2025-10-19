@@ -1,102 +1,48 @@
 import Foundation
-import Alamofire
 
 protocol APIClient {
-    func fetchWeatherData(latitude: Double, longitude: Double) async throws -> WeatherResponse
+    func fetchWeatherData(latitude: Double, longitude: Double) async throws -> OpenMeteoResponse
 }
 
 class APIClientImpl: APIClient {
-    private let session = Session.default
-    private let baseURL = "https://api.weatherapi.com/v1"
-    // Free API key for testing - replace with your own for production
-    // Get your free API key at: https://www.weatherapi.com/signup.aspx
-    private let apiKey = "YOUR_API_KEY" // Replace with actual API key
-    private let useMockData = true // Set to false when you have a valid API key
+    private let baseURL = "https://api.open-meteo.com/v1/forecast"
+    private let urlSession = URLSession.shared
 
-    func fetchWeatherData(latitude: Double, longitude: Double) async throws -> WeatherResponse {
-        // If API key is not set or we're using mock data, return mock response
-        if apiKey == "YOUR_API_KEY" || useMockData {
-            return getMockWeatherResponse()
-        }
-        
-        let urlString = "\(baseURL)/current.json"
-        let parameters: [String: Any] = [
-            "key": apiKey,
-            "q": "\(latitude),\(longitude)",
-            "aqi": "no"
+    func fetchWeatherData(latitude: Double, longitude: Double) async throws -> OpenMeteoResponse {
+        // Build URL with query parameters
+        var components = URLComponents(string: baseURL)
+        components?.queryItems = [
+            URLQueryItem(name: "latitude", value: String(latitude)),
+            URLQueryItem(name: "longitude", value: String(longitude)),
+            URLQueryItem(name: "daily", value: "temperature_2m_mean"),
+            URLQueryItem(name: "forecast_days", value: "1")
         ]
 
-        return try await withCheckedThrowingContinuation { continuation in
-            session.request(urlString, parameters: parameters)
-                .validate()
-                .responseDecodable(of: WeatherResponse.self) { response in
-                    switch response.result {
-                    case .success(let weatherResponse):
-                        continuation.resume(returning: weatherResponse)
-                    case .failure(let error):
-                        // Fallback to mock data on error
-                        print("Weather API error: \(error), using mock data")
-                        continuation.resume(returning: self.getMockWeatherResponse())
-                    }
-                }
+        guard let url = components?.url else {
+            throw APIError.invalidURL
         }
-    }
-    
-    private func getMockWeatherResponse() -> WeatherResponse {
-        // Return mock weather data for testing
-        let currentHour = Calendar.current.component(.hour, from: Date())
-        let temperature: Double
-        let humidity: Int
-        let condition: String
-        
-        // Simulate different weather based on time of day
-        switch currentHour {
-        case 6..<10:
-            temperature = 18.0
-            humidity = 65
-            condition = "Partly cloudy"
-        case 10..<14:
-            temperature = 25.0
-            humidity = 55
-            condition = "Sunny"
-        case 14..<18:
-            temperature = 28.0
-            humidity = 45
-            condition = "Clear"
-        case 18..<22:
-            temperature = 22.0
-            humidity = 60
-            condition = "Partly cloudy"
-        default:
-            temperature = 16.0
-            humidity = 70
-            condition = "Clear"
+
+        // Make the API request
+        let (data, response) = try await urlSession.data(from: url)
+
+        // Validate HTTP response
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
         }
-        
-        return WeatherResponse(
-            current: CurrentWeather(
-                tempC: temperature,
-                tempF: temperature * 1.8 + 32,
-                humidity: humidity,
-                condition: WeatherConditionResponse(
-                    text: condition,
-                    icon: "//cdn.weatherapi.com/weather/64x64/day/116.png",
-                    code: 1003
-                ),
-                feelslikeC: temperature - 1.0,
-                feelslikeF: (temperature - 1.0) * 1.8 + 32
-            ),
-            location: Location(
-                name: "Current Location",
-                region: "",
-                country: "Mock Data",
-                lat: 0.0,
-                lon: 0.0,
-                tzId: "Local",
-                localtimeEpoch: Int(Date().timeIntervalSince1970),
-                localtime: DateFormatter.localizedString(from: Date(), dateStyle: .short, timeStyle: .short)
-            )
-        )
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw APIError.serverError(httpResponse.statusCode)
+        }
+
+        // Decode the response
+        do {
+            let decoder = JSONDecoder()
+            let weatherResponse = try decoder.decode(OpenMeteoResponse.self, from: data)
+            return weatherResponse
+        } catch {
+            print("Decoding error: \(error)")
+            throw APIError.decodingError
+        }
     }
 }
 

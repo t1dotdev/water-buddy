@@ -8,6 +8,8 @@ class HomeViewModel: ObservableObject {
     @Published var percentage: Double = 0
     @Published var user: User?
     @Published var weatherRecommendation: String = ""
+    @Published var currentTemperature: Double = 0.0
+    @Published var weatherData: WeatherData?
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var lastSevenDays: [Double] = []
@@ -109,11 +111,17 @@ class HomeViewModel: ObservableObject {
 
     private func loadWeatherData() async {
         do {
+            let weather = try await getWeatherUseCase.getCurrentWeather()
             let recommendation = try await getWeatherUseCase.execute()
+
+            weatherData = weather
+            currentTemperature = weather.temperature
             weatherRecommendation = recommendation.reason
         } catch {
             print("Weather loading failed: \(error.localizedDescription)")
             weatherRecommendation = NSLocalizedString("weather.unavailable", value: "Weather data unavailable", comment: "")
+            currentTemperature = 0.0
+            weatherData = nil
         }
     }
 

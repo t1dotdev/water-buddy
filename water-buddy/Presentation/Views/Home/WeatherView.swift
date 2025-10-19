@@ -28,6 +28,16 @@ class WeatherView: UIView {
         return label
     }()
 
+    private lazy var temperatureLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = FontManager.shared.title1
+        label.textColor = Constants.Colors.primaryBlue
+        label.textAlignment = .right
+        label.text = "--°C"
+        return label
+    }()
+
     private lazy var recommendationLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -53,6 +63,7 @@ class WeatherView: UIView {
 
         containerView.addSubview(iconImageView)
         containerView.addSubview(titleLabel)
+        containerView.addSubview(temperatureLabel)
         containerView.addSubview(recommendationLabel)
 
         NSLayoutConstraint.activate([
@@ -68,11 +79,14 @@ class WeatherView: UIView {
 
             titleLabel.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: Constants.Dimensions.paddingSmall),
             titleLabel.topAnchor.constraint(equalTo: iconImageView.topAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
+            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: temperatureLabel.leadingAnchor, constant: -Constants.Dimensions.paddingSmall),
+
+            temperatureLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
+            temperatureLabel.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
 
             recommendationLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             recommendationLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Constants.Dimensions.paddingSmall),
-            recommendationLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
+            recommendationLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
             recommendationLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium)
         ])
     }
@@ -84,6 +98,36 @@ class WeatherView: UIView {
 
         // Update icon based on recommendation content
         updateIcon(for: recommendation)
+    }
+
+    func setTemperature(_ temperature: Double) {
+        let formattedTemp = String(format: "%.1f°C", temperature)
+        UIView.transition(with: temperatureLabel, duration: Constants.Animation.fastDuration, options: .transitionCrossDissolve, animations: {
+            self.temperatureLabel.text = formattedTemp
+        })
+
+        // Update temperature label color based on temperature
+        updateTemperatureColor(for: temperature)
+    }
+
+    private func updateTemperatureColor(for temperature: Double) {
+        var color = Constants.Colors.primaryBlue
+
+        if temperature > 35 {
+            color = .systemRed
+        } else if temperature > 30 {
+            color = .systemOrange
+        } else if temperature > 25 {
+            color = .systemYellow
+        } else if temperature > 15 {
+            color = Constants.Colors.primaryBlue
+        } else {
+            color = .systemCyan
+        }
+
+        UIView.transition(with: temperatureLabel, duration: Constants.Animation.fastDuration, options: .transitionCrossDissolve, animations: {
+            self.temperatureLabel.textColor = color
+        })
     }
 
     private func updateIcon(for recommendation: String) {

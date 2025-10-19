@@ -33,29 +33,30 @@ class GetWeatherUseCaseImpl: GetWeatherUseCase {
         return try await withCheckedThrowingContinuation { continuation in
             // Check current authorization status
             let status = locationManager.authorizationStatus
-            
+
             switch status {
             case .authorizedWhenInUse, .authorizedAlways:
                 if let location = locationManager.location {
                     continuation.resume(returning: location)
                 } else {
                     // Use a default location if current location is not available
-                    // Default to San Francisco coordinates for demo
-                    let defaultLocation = CLLocation(latitude: 37.7749, longitude: -122.4194)
+                    // Default to Bangkok coordinates
+                    let defaultLocation = CLLocation(latitude: 13.754, longitude: 100.5014)
                     continuation.resume(returning: defaultLocation)
                 }
             case .denied, .restricted:
                 // Use default location instead of throwing error
-                let defaultLocation = CLLocation(latitude: 37.7749, longitude: -122.4194)
+                // Default to Bangkok, Thailand
+                let defaultLocation = CLLocation(latitude: 13.754, longitude: 100.5014)
                 continuation.resume(returning: defaultLocation)
             case .notDetermined:
                 // Request permission
                 locationManager.requestWhenInUseAuthorization()
                 // Use default location for now
-                let defaultLocation = CLLocation(latitude: 37.7749, longitude: -122.4194)
+                let defaultLocation = CLLocation(latitude: 13.754, longitude: 100.5014)
                 continuation.resume(returning: defaultLocation)
             @unknown default:
-                let defaultLocation = CLLocation(latitude: 37.7749, longitude: -122.4194)
+                let defaultLocation = CLLocation(latitude: 13.754, longitude: 100.5014)
                 continuation.resume(returning: defaultLocation)
             }
         }
