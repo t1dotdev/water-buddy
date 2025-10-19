@@ -128,7 +128,18 @@ class AppCoordinator {
 
             do {
                 let entry = try await addWaterUseCase.execute(amount: amount, container: .glass)
-                showSuccessAlert(message: NSLocalizedString("quickaction.success.added", value: "Added \(Int(amount))ml successfully!", comment: ""))
+
+                // Format success message with actual amount
+                let message = String(format: NSLocalizedString("quickaction.success.added", value: "Added %dml successfully!", comment: ""), Int(amount))
+                showSuccessAlert(message: message)
+
+                // Post notification to update other views
+                NotificationCenter.default.post(
+                    name: Notification.Name("WaterIntakeUpdated"),
+                    object: nil,
+                    userInfo: ["amount": amount, "entry": entry]
+                )
+
                 // Navigate to home tab to show updated progress
                 tabBarController?.selectedIndex = 0
             } catch {
