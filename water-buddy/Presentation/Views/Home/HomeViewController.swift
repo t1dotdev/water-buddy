@@ -23,12 +23,6 @@ class HomeViewController: UIViewController {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .clear
-        view.layer.cornerRadius = Constants.Dimensions.cornerRadius
-        view.layer.shadowColor = Constants.Colors.shadow.cgColor
-        view.layer.shadowOffset = CGSize(width: 0, height: 8)
-        view.layer.shadowRadius = 16
-        view.layer.shadowOpacity = 0.0
-        
         return view
     }()
     
@@ -67,24 +61,7 @@ class HomeViewController: UIViewController {
     private lazy var statsCardView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = Constants.Colors.backgroundSecondary
-        view.layer.cornerRadius = Constants.Dimensions.cornerRadius
-        view.layer.shadowColor = Constants.Colors.shadow.cgColor
-        view.layer.shadowOffset = CGSize(width: 0, height: 6)
-        view.layer.shadowRadius = 12
-        view.layer.shadowOpacity = 0.1
-        
-        // Add gradient border effect
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [
-            UIColor.systemOrange.withAlphaComponent(0.3).cgColor,
-            UIColor.systemOrange.withAlphaComponent(0.1).cgColor
-        ]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 0)
-        gradientLayer.cornerRadius = Constants.Dimensions.cornerRadius
-        view.layer.insertSublayer(gradientLayer, at: 0)
-        
+        view.backgroundColor = .clear
         return view
     }()
     
@@ -121,24 +98,7 @@ class HomeViewController: UIViewController {
     private lazy var quickAddContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = Constants.Colors.backgroundSecondary
-        view.layer.cornerRadius = Constants.Dimensions.cornerRadius
-        view.layer.shadowColor = Constants.Colors.shadow.cgColor
-        view.layer.shadowOffset = CGSize(width: 0, height: 6)
-        view.layer.shadowRadius = 12
-        view.layer.shadowOpacity = 0.1
-        
-        // Add subtle gradient
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [
-            UIColor.systemGreen.withAlphaComponent(0.03).cgColor,
-            UIColor.systemBlue.withAlphaComponent(0.03).cgColor
-        ]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
-        gradientLayer.cornerRadius = Constants.Dimensions.cornerRadius
-        view.layer.insertSublayer(gradientLayer, at: 0)
-        
+        view.backgroundColor = .clear
         return view
     }()
     
@@ -178,24 +138,7 @@ class HomeViewController: UIViewController {
     private lazy var weatherCardView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = Constants.Colors.backgroundSecondary
-        view.layer.cornerRadius = Constants.Dimensions.cornerRadius
-        view.layer.shadowColor = Constants.Colors.shadow.cgColor
-        view.layer.shadowOffset = CGSize(width: 0, height: 6)
-        view.layer.shadowRadius = 12
-        view.layer.shadowOpacity = 0.1
-        
-        // Add weather-themed gradient
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [
-            UIColor.systemCyan.withAlphaComponent(0.05).cgColor,
-            UIColor.systemBlue.withAlphaComponent(0.02).cgColor
-        ]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
-        gradientLayer.cornerRadius = Constants.Dimensions.cornerRadius
-        view.layer.insertSublayer(gradientLayer, at: 0)
-        
+        view.backgroundColor = .clear
         return view
     }()
     
@@ -232,24 +175,7 @@ class HomeViewController: UIViewController {
     private lazy var chartCardView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = Constants.Colors.backgroundSecondary
-        view.layer.cornerRadius = Constants.Dimensions.cornerRadius
-        view.layer.shadowColor = Constants.Colors.shadow.cgColor
-        view.layer.shadowOffset = CGSize(width: 0, height: 6)
-        view.layer.shadowRadius = 12
-        view.layer.shadowOpacity = 0.1
-        
-        // Add chart-themed gradient
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [
-            UIColor.systemPurple.withAlphaComponent(0.03).cgColor,
-            UIColor.systemIndigo.withAlphaComponent(0.03).cgColor
-        ]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
-        gradientLayer.cornerRadius = Constants.Dimensions.cornerRadius
-        view.layer.insertSublayer(gradientLayer, at: 0)
-        
+        view.backgroundColor = .clear
         return view
     }()
     
@@ -290,13 +216,7 @@ class HomeViewController: UIViewController {
         label.textColor = Constants.Colors.textSecondary
         label.textAlignment = .center
         label.numberOfLines = 2
-        
-        // Add subtle styling
-        label.layer.cornerRadius = 8
-        label.backgroundColor = Constants.Colors.backgroundSecondary.withAlphaComponent(0.5)
-        label.layer.borderWidth = 1
-        label.layer.borderColor = Constants.Colors.separator.withAlphaComponent(0.3).cgColor
-        
+        label.backgroundColor = .clear
         return label
     }()
 
@@ -337,26 +257,6 @@ class HomeViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        // Update gradient layers for all cards
-        updateGradientLayers()
-    }
-    
-    private func updateGradientLayers() {
-        updateCardGradient(progressCardView)
-        updateCardGradient(statsCardView)
-        updateCardGradient(quickAddContainerView)
-        updateCardGradient(weatherCardView)
-        updateCardGradient(chartCardView)
-    }
-    
-    private func updateCardGradient(_ cardView: UIView) {
-        if let gradientLayer = cardView.layer.sublayers?.first as? CAGradientLayer {
-            gradientLayer.frame = cardView.bounds
-        }
-    }
 
     // MARK: - Setup Methods
 
@@ -459,10 +359,10 @@ class HomeViewController: UIViewController {
             progressCircleView.heightAnchor.constraint(equalToConstant: Constants.Dimensions.progressCircleSize),
             progressCircleView.bottomAnchor.constraint(equalTo: progressCardView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium),
 
-            // Stats card
-            statsCardView.topAnchor.constraint(equalTo: progressCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
-            statsCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
-            statsCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
+            // Quick add section
+            quickAddContainerView.topAnchor.constraint(equalTo: progressCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
+            quickAddContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
+            quickAddContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             statsHeaderView.topAnchor.constraint(equalTo: statsCardView.topAnchor, constant: Constants.Dimensions.paddingMedium),
             statsHeaderView.leadingAnchor.constraint(equalTo: statsCardView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
@@ -482,19 +382,14 @@ class HomeViewController: UIViewController {
             streakView.trailingAnchor.constraint(equalTo: statsCardView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
             streakView.bottomAnchor.constraint(equalTo: statsCardView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium),
 
-            // Quick add section
-            quickAddContainerView.topAnchor.constraint(equalTo: statsCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
-            quickAddContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
-            quickAddContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
-
             quickAddHeaderView.topAnchor.constraint(equalTo: quickAddContainerView.topAnchor, constant: Constants.Dimensions.paddingMedium),
             quickAddHeaderView.leadingAnchor.constraint(equalTo: quickAddContainerView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
             quickAddHeaderView.trailingAnchor.constraint(equalTo: quickAddContainerView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
-            
+
             quickAddTitleLabel.topAnchor.constraint(equalTo: quickAddHeaderView.topAnchor),
             quickAddTitleLabel.leadingAnchor.constraint(equalTo: quickAddHeaderView.leadingAnchor),
             quickAddTitleLabel.trailingAnchor.constraint(equalTo: quickAddHeaderView.trailingAnchor),
-            
+
             quickAddSubtitleLabel.topAnchor.constraint(equalTo: quickAddTitleLabel.bottomAnchor, constant: 2),
             quickAddSubtitleLabel.leadingAnchor.constraint(equalTo: quickAddHeaderView.leadingAnchor),
             quickAddSubtitleLabel.trailingAnchor.constraint(equalTo: quickAddHeaderView.trailingAnchor),
@@ -505,8 +400,13 @@ class HomeViewController: UIViewController {
             quickAddStackView.trailingAnchor.constraint(equalTo: quickAddContainerView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
             quickAddStackView.bottomAnchor.constraint(equalTo: quickAddContainerView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium),
 
+            // Stats card
+            statsCardView.topAnchor.constraint(equalTo: quickAddContainerView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
+            statsCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
+            statsCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
+
             // Weather card
-            weatherCardView.topAnchor.constraint(equalTo: quickAddContainerView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
+            weatherCardView.topAnchor.constraint(equalTo: statsCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
             weatherCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
             weatherCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
 
