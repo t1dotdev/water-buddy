@@ -8,6 +8,7 @@ class HomeViewModel: ObservableObject {
     @Published var percentage: Double = 0
     @Published var user: User?
     @Published var weatherRecommendation: String = ""
+    @Published var hydrationRecommendation: HydrationRecommendation?
     @Published var currentTemperature: Double = 0.0
     @Published var weatherData: WeatherData?
     @Published var isLoading: Bool = false
@@ -92,21 +93,24 @@ class HomeViewModel: ObservableObject {
     // MARK: - Private Methods
 
     private func setupBindings() {
-        // Update percentage when intake or goal changes
-        Publishers.CombineLatest($dailyIntake, $dailyGoal)
-            .map { intake, goal in
-                guard goal > 0 else { return 0.0 }
-                return min(intake / goal, 1.0) * 100.0
+        // Update percentage when intake, goal, or recommendation changes
+        Publishers.CombineLatest3($dailyIntake, $dailyGoal, $hydrationRecommendation)
+            .map { [weak self] intake, goal, recommendation in
+                guard let self = self else { return 0.0 }
+                let goalToUse = recommendation != nil ? (goal * recommendation!.multiplier) : goal
+                guard goalToUse > 0 else { return 0.0 }
+                return min(intake / goalToUse, 1.0) * 100.0
             }
             .assign(to: &$percentage)
     }
 
     func calculateProgress() {
-        guard dailyGoal > 0 else {
+        let goalToUse = recommendedDailyGoal
+        guard goalToUse > 0 else {
             percentage = 0
             return
         }
-        percentage = min(dailyIntake / dailyGoal, 1.0) * 100.0
+        percentage = min(dailyIntake / goalToUse, 1.0) * 100.0
     }
 
     private func loadWeatherData() async {
@@ -117,11 +121,13 @@ class HomeViewModel: ObservableObject {
             weatherData = weather
             currentTemperature = weather.temperature
             weatherRecommendation = recommendation.reason
+            hydrationRecommendation = recommendation
         } catch {
             print("Weather loading failed: \(error.localizedDescription)")
             weatherRecommendation = NSLocalizedString("weather.unavailable", value: "Weather data unavailable", comment: "")
             currentTemperature = 0.0
             weatherData = nil
+            hydrationRecommendation = nil
         }
     }
 
@@ -159,6 +165,25 @@ class HomeViewModel: ObservableObject {
 
     var isGoalAchieved: Bool {
         return dailyIntake >= dailyGoal
+    }
+
+    var recommendedDailyGoal: Double {
+        guard let recommendation = hydrationRecommendation else { return dailyGoal }
+        return dailyGoal * recommendation.multiplier
+    }
+
+    var shouldShowRecommendation: Bool {
+        guard let recommendation = hydrationRecommendation else { return false }
+        return recommendation.multiplier != 1.0
+    }
+
+    var recommendationPercentage: Int {
+        guard let recommendation = hydrationRecommendation else { return 0 }
+        return Int((recommendation.multiplier - 1.0) * 100)
+    }
+
+    var formattedRecommendedGoal: String {
+        return String(format: "%.0f ml", recommendedDailyGoal)
     }
 
     var motivationalMessage: String {

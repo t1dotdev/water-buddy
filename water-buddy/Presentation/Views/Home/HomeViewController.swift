@@ -355,8 +355,8 @@ class HomeViewController: UIViewController {
         super.viewDidAppear(animated)
         // Force a refresh of the progress view
         progressCircleView.setProgress(viewModel.percentage / 100.0, animated: false)
-        progressCircleView.setIntake(viewModel.formattedDailyIntake, goal: viewModel.formattedDailyGoal)
-        
+        updateProgressView()
+
         // Add staggered card animations
         animateCardsEntry()
     }
@@ -662,17 +662,22 @@ class HomeViewController: UIViewController {
 
         viewModel.$dailyIntake
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] intake in
-                guard let self = self else { return }
-                self.progressCircleView.setIntake(self.viewModel.formattedDailyIntake, goal: self.viewModel.formattedDailyGoal)
+            .sink { [weak self] _ in
+                self?.updateProgressView()
             }
             .store(in: &cancellables)
 
         viewModel.$dailyGoal
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                guard let self = self else { return }
-                self.progressCircleView.setIntake(self.viewModel.formattedDailyIntake, goal: self.viewModel.formattedDailyGoal)
+                self?.updateProgressView()
+            }
+            .store(in: &cancellables)
+
+        viewModel.$hydrationRecommendation
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateProgressView()
             }
             .store(in: &cancellables)
 
@@ -721,6 +726,21 @@ class HomeViewController: UIViewController {
                 self?.showAlert(title: NSLocalizedString("alert.error", value: "Error", comment: ""), message: error)
             }
             .store(in: &cancellables)
+    }
+
+    // MARK: - Helper Methods
+
+    private func updateProgressView() {
+        let intake = viewModel.formattedDailyIntake
+        let baseGoal = viewModel.formattedDailyGoal
+        let recommendedGoal = viewModel.formattedRecommendedGoal
+
+        progressCircleView.setGoals(
+            intake: intake,
+            baseGoal: baseGoal,
+            recommendedGoal: recommendedGoal,
+            showRecommendation: viewModel.shouldShowRecommendation
+        )
     }
 
     // MARK: - Actions
@@ -785,7 +805,7 @@ class HomeViewController: UIViewController {
             viewModel.calculateProgress()
 
             // Explicitly update the progress view with new goal
-            progressCircleView.setIntake(viewModel.formattedDailyIntake, goal: viewModel.formattedDailyGoal)
+            updateProgressView()
             progressCircleView.setProgress(viewModel.percentage / 100.0, animated: true)
         }
 

@@ -179,6 +179,19 @@ class CircularProgressView: UIView {
         goalLabel.text = String(format: NSLocalizedString("progress.of_goal", value: "of %@", comment: ""), goal)
     }
 
+    func setGoals(intake: String, baseGoal: String, recommendedGoal: String?, showRecommendation: Bool) {
+        intakeLabel.text = intake
+
+        if showRecommendation, let recommended = recommendedGoal {
+            // Format: "of 2000ml → 2400ml"
+            let goalText = String(format: NSLocalizedString("progress.of_goal_with_recommendation", value: "of %@ → %@", comment: ""), baseGoal, recommended)
+            goalLabel.text = goalText
+        } else {
+            // Format: "of 2000ml"
+            goalLabel.text = String(format: NSLocalizedString("progress.of_goal", value: "of %@", comment: ""), baseGoal)
+        }
+    }
+
     private func updateAppearanceForProgress(_ progress: Double) {
         let (startColor, endColor): (UIColor, UIColor)
 
