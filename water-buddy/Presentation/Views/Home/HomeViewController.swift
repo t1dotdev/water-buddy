@@ -408,15 +408,15 @@ class HomeViewController: UIViewController {
             quickAddStackView.trailingAnchor.constraint(equalTo: quickAddContainerView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
             quickAddStackView.bottomAnchor.constraint(equalTo: quickAddContainerView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium),
 
-            // Stats card
-            statsCardView.topAnchor.constraint(equalTo: quickAddContainerView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
-            statsCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
-            statsCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
-
             // Weather card
-            weatherCardView.topAnchor.constraint(equalTo: statsCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
+            weatherCardView.topAnchor.constraint(equalTo: quickAddContainerView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
             weatherCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
             weatherCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
+
+            // Stats card
+            statsCardView.topAnchor.constraint(equalTo: weatherCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
+            statsCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
+            statsCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             weatherHeaderView.topAnchor.constraint(equalTo: weatherCardView.topAnchor, constant: Constants.Dimensions.paddingMedium),
             weatherHeaderView.leadingAnchor.constraint(equalTo: weatherCardView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
@@ -437,7 +437,7 @@ class HomeViewController: UIViewController {
             weatherView.bottomAnchor.constraint(equalTo: weatherCardView.bottomAnchor, constant: -Constants.Dimensions.paddingMedium),
 
             // Chart card
-            chartCardView.topAnchor.constraint(equalTo: weatherCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
+            chartCardView.topAnchor.constraint(equalTo: statsCardView.bottomAnchor, constant: Constants.Dimensions.paddingMedium),
             chartCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Dimensions.paddingMedium),
             chartCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.Dimensions.paddingMedium),
 
@@ -474,7 +474,7 @@ class HomeViewController: UIViewController {
     }
 
     private func setupNavigationBar() {
-        navigationItem.title = NSLocalizedString("home.title", value: "Water Tracker", comment: "")
+        navigationItem.title = "Water Buddy"
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             image: UIImage(systemName: "person.circle"),
             style: .plain,
@@ -709,7 +709,7 @@ class HomeViewController: UIViewController {
     // MARK: - Animation Methods
     
     private func animateCardsEntry() {
-        let cards = [progressCardView, statsCardView, quickAddContainerView, weatherCardView, chartCardView]
+        let cards = [progressCardView, quickAddContainerView, weatherCardView, statsCardView, chartCardView]
         
         for (index, card) in cards.enumerated() {
             card.transform = CGAffineTransform(translationX: 0, y: 50)

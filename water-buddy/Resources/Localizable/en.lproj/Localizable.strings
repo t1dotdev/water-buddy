@@ -42,12 +42,15 @@
 
 /* Weather Recommendations */
 "weather.recommendation.normal" = "Normal hydration recommended";
-"weather.recommendation.hot" = "Hot weather! Increase water intake by 30%";
-"weather.recommendation.warm" = "Warm weather. Increase water intake by 15%";
+"weather.recommendation.cold" = "Cool weather. Maintain regular water intake";
+"weather.recommendation.mild" = "Mild weather. Increase water intake by 5%";
+"weather.recommendation.warm" = "Warm weather. Increase water intake by 10%";
+"weather.recommendation.hot" = "Hot weather! Increase water intake by 20%";
+"weather.recommendation.very_hot" = "Very hot weather! Increase water intake by 35%";
+"weather.recommendation.extreme_heat" = "Extreme heat! Critical to stay hydrated. Increase water intake by 50%";
 "weather.recommendation.dry" = " Dry air increases dehydration.";
 "weather.recommendation.humid" = " High humidity requires extra hydration.";
 "weather.recommendation.sunny" = " Sunny conditions increase water needs.";
-"weather.recommendation.extreme_heat" = "Extreme heat! Critical to stay hydrated";
 "weather.recommendation.very_humid" = " Very humid conditions increase sweating.";
 
 /* Add Water */
@@ -83,6 +86,7 @@
 "stats.week" = "Week";
 "stats.month" = "Month";
 "stats.year" = "Year";
+"stats.goal_achievement" = "%.0f%% of daily goal";
 "chart.weekly_progress" = "Weekly Progress";
 
 /* Time Periods */

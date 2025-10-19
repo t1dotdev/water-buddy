@@ -88,7 +88,7 @@ class StatisticsViewController: UIViewController {
         label.font = FontManager.shared.caption1
         label.textColor = Constants.Colors.textSecondary
         label.textAlignment = .center
-        label.text = "0% of daily goal"
+        label.text = String(format: NSLocalizedString("stats.goal_achievement", value: "%.0f%% of daily goal", comment: ""), 0.0)
         return label
     }()
     
@@ -517,7 +517,7 @@ class StatisticsViewController: UIViewController {
         guard let stats = statistics else {
             totalIntakeLabel.text = "0ml"
             goalProgressView.progress = 0
-            goalAchievementLabel.text = "0% of daily goal"
+            goalAchievementLabel.text = String(format: NSLocalizedString("stats.goal_achievement", value: "%.0f%% of daily goal", comment: ""), 0.0)
             updateSummaryCard(streakCard, title: "0")
             updateSummaryCard(averageCard, title: "0ml")
             updateSummaryCard(peakHourCard, title: "--:--")
@@ -530,7 +530,7 @@ class StatisticsViewController: UIViewController {
         totalIntakeLabel.text = stats.formattedTotalIntake
         let progress = Float(stats.completionPercentage / 100.0)
         goalProgressView.progress = progress
-        goalAchievementLabel.text = String(format: "%.0f%% of daily goal", stats.completionPercentage)
+        goalAchievementLabel.text = String(format: NSLocalizedString("stats.goal_achievement", value: "%.0f%% of daily goal", comment: ""), stats.completionPercentage)
         
         // Update goal achievement color
         if stats.goalAchieved {

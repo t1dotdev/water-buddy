@@ -54,12 +54,15 @@
 
 /* Weather Recommendations */
 "weather.recommendation.normal" = "แนะนำให้ดื่มน้ำตามปกติ";
-"weather.recommendation.hot" = "อากาศร้อน! เพิ่มการดื่มน้ำ 30%";
-"weather.recommendation.warm" = "อากาศอบอุ่น เพิ่มการดื่มน้ำ 15%";
+"weather.recommendation.cold" = "อากาศเย็น ดื่มน้ำตามปกติ";
+"weather.recommendation.mild" = "อากาศอบอุ่นเล็กน้อย เพิ่มการดื่มน้ำ 5%";
+"weather.recommendation.warm" = "อากาศอบอุ่น เพิ่มการดื่มน้ำ 10%";
+"weather.recommendation.hot" = "อากาศร้อน! เพิ่มการดื่มน้ำ 20%";
+"weather.recommendation.very_hot" = "อากาศร้อนมาก! เพิ่มการดื่มน้ำ 35%";
+"weather.recommendation.extreme_heat" = "อากาศร้อนจัด! ดื่มน้ำให้เพียงพอ เพิ่มการดื่มน้ำ 50%";
 "weather.recommendation.dry" = " อากาศแห้งทำให้ขาดน้ำได้ง่าย";
 "weather.recommendation.humid" = " ความชื้นสูงต้องดื่มน้ำเพิ่ม";
 "weather.recommendation.sunny" = " สภาพอากาศแดดจัดต้องดื่มน้ำมากขึ้น";
-"weather.recommendation.extreme_heat" = "อากาศร้อนจัด! ดื่มน้ำให้เพียงพอ";
 "weather.recommendation.very_humid" = " อากาศชื้นมากทำให้เหงื่อออกมาก";
 
 /* Add Water */
@@ -103,6 +106,7 @@
 "stats.peak_hour" = "ช่วงเวลาสูงสุด";
 "stats.weekly_trend" = "แนวโน้มรายสัปดาห์";
 "stats.container_usage" = "การใช้ภาชนะ";
+"stats.goal_achievement" = "%.0f%% ของเป้าหมายรายวัน";
 "chart.weekly_progress" = "ความคืบหน้ารายสัปดาห์";
 
 /* Time Periods */

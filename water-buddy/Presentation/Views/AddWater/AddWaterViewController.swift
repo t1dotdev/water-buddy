@@ -85,7 +85,7 @@ class AddWaterViewController: UIViewController {
     }()
     
     private lazy var containerSegmentedControl: UISegmentedControl = {
-        let items = ["Glass", "Bottle", "Cup", "Mug"]
+        let items = [ContainerType.glass, .bottle, .cup, .mug].map { $0.displayName }
         let control = UISegmentedControl(items: items)
         control.translatesAutoresizingMaskIntoConstraints = false
         control.selectedSegmentIndex = 0
