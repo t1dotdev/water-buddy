@@ -432,12 +432,6 @@ class HomeViewController: UIViewController {
         setupQuickAddButtons()
         setupConstraints()
         setupRefreshControl()
-        
-        // Add hover effects to cards
-        addCardHoverEffect(to: progressCardView)
-        addCardHoverEffect(to: statsCardView)
-        addCardHoverEffect(to: weatherCardView)
-        addCardHoverEffect(to: chartCardView)
     }
 
     private func setupQuickAddButtons() {
@@ -888,31 +882,6 @@ class HomeViewController: UIViewController {
                     self.greetingLabel.transform = .identity
                 }
             )
-        }
-    }
-    
-    private func addCardHoverEffect(to card: UIView) {
-        let hoverGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleCardHover(_:)))
-        hoverGesture.minimumPressDuration = 0
-        card.addGestureRecognizer(hoverGesture)
-    }
-    
-    @objc private func handleCardHover(_ gesture: UILongPressGestureRecognizer) {
-        guard let card = gesture.view else { return }
-        
-        switch gesture.state {
-        case .began:
-            UIView.animate(withDuration: 0.2) {
-                card.transform = CGAffineTransform(scaleX: 1.02, y: 1.02)
-                card.layer.shadowOpacity = 0.2
-            }
-        case .ended, .cancelled:
-            UIView.animate(withDuration: 0.2) {
-                card.transform = .identity
-                card.layer.shadowOpacity = 0.1
-            }
-        default:
-            break
         }
     }
 
