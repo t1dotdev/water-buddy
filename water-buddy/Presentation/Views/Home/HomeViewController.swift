@@ -504,6 +504,13 @@ class HomeViewController: UIViewController {
             name: Notification.Name("PreferredUnitUpdated"),
             object: nil
         )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(goalCompleted),
+            name: Notification.Name("GoalCompletedNotification"),
+            object: nil
+        )
     }
 
     private func setupBindings() {
@@ -703,18 +710,31 @@ class HomeViewController: UIViewController {
         updateProgressView()
     }
 
+    @objc private func goalCompleted(_ notification: Notification) {
+        // Check if we should show confetti for today
+        guard ConfettiTracker.shared.shouldShowConfetti else {
+            return
+        }
+
+        // Show confetti animation
+        showConfetti()
+
+        // Mark confetti as shown for today
+        ConfettiTracker.shared.markConfettiShown()
+    }
+
     // MARK: - Private Methods
 
     
     // MARK: - Animation Methods
-    
+
     private func animateCardsEntry() {
         let cards = [progressCardView, quickAddContainerView, weatherCardView, statsCardView, chartCardView]
-        
+
         for (index, card) in cards.enumerated() {
             card.transform = CGAffineTransform(translationX: 0, y: 50)
             card.alpha = 0
-            
+
             UIView.animate(
                 withDuration: 0.6,
                 delay: Double(index) * 0.1,
@@ -728,6 +748,14 @@ class HomeViewController: UIViewController {
             )
         }
     }
-    
+
+    private func showConfetti() {
+        let confettiView = ConfettiView(frame: view.bounds)
+        view.addSubview(confettiView)
+        confettiView.start {
+            // Confetti will auto-remove after animation
+        }
+    }
+
 
 }

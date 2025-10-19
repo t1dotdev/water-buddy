@@ -155,11 +155,31 @@ class AddWaterViewController: UIViewController {
             name: Notification.Name("PreferredUnitUpdated"),
             object: nil
         )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(goalCompleted),
+            name: Notification.Name("GoalCompletedNotification"),
+            object: nil
+        )
     }
 
     @objc private func preferredUnitUpdated(_ notification: Notification) {
         updateUnitLabels()
         updateQuickAmountButtons()
+    }
+
+    @objc private func goalCompleted(_ notification: Notification) {
+        // Check if we should show confetti for today
+        guard ConfettiTracker.shared.shouldShowConfetti else {
+            return
+        }
+
+        // Show confetti animation
+        showConfetti()
+
+        // Mark confetti as shown for today
+        ConfettiTracker.shared.markConfettiShown()
     }
 
     private func updateUnitLabels() {
@@ -483,6 +503,14 @@ class AddWaterViewController: UIViewController {
 
         containerSegmentedControl.selectedSegmentIndex = 0
         viewModel.selectedContainer = .glass
+    }
+
+    private func showConfetti() {
+        let confettiView = ConfettiView(frame: view.bounds)
+        view.addSubview(confettiView)
+        confettiView.start {
+            // Confetti will auto-remove after animation
+        }
     }
 }
 

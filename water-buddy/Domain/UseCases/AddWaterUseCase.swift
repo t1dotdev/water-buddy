@@ -25,6 +25,9 @@ class AddWaterUseCaseImpl: AddWaterUseCase {
         // Get user preferences for unit
         let user = try await userRepository.getUser()
 
+        // Get intake BEFORE adding water to detect goal completion
+        let intakeBeforeAdding = try await waterRepository.getTotalIntakeForDate(Date())
+
         // Create water entry
         let entry = WaterEntry(
             amount: amount,
@@ -38,10 +41,33 @@ class AddWaterUseCaseImpl: AddWaterUseCase {
         // Update user's last active date
         try await userRepository.updateLastActiveDate()
 
+        // Get intake AFTER adding water
+        let intakeAfterAdding = try await waterRepository.getTotalIntakeForDate(Date())
+
+        // Check if goal was just completed
+        checkGoalCompletion(
+            intakeBefore: intakeBeforeAdding,
+            intakeAfter: intakeAfterAdding,
+            goal: user.dailyGoal
+        )
+
         // Check if daily goal is achieved and update streak
         try await updateStreakIfNeeded(user: user)
 
         return entry
+    }
+
+    private func checkGoalCompletion(intakeBefore: Double, intakeAfter: Double, goal: Double) {
+        // Check if we just crossed the goal threshold
+        if intakeBefore < goal && intakeAfter >= goal {
+            // Post notification for goal completion on main thread (triggers UI updates)
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("GoalCompletedNotification"),
+                    object: nil
+                )
+            }
+        }
     }
 
     private func updateStreakIfNeeded(user: User) async throws {
